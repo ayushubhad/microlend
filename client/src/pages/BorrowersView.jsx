@@ -54,7 +54,7 @@ export default function BorrowersView({ setActiveTab }) {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* Top Banner */}
+      {/* Header */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
@@ -141,7 +141,7 @@ export default function BorrowersView({ setActiveTab }) {
         )}
       </section>
 
-      {/* Borrower Detail Modal / Drawer */}
+      {/* Borrower Details Modal */}
       {selectedBorrower && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px] p-4">
           <div className="bg-white rounded-[16px] max-w-2xl w-full p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-[#ebebeb] max-h-[90vh] overflow-y-auto">

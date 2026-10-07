@@ -5,10 +5,7 @@ const { roundToTwoDecimals } = require('../services/financial');
 
 const router = express.Router();
 
-/**
- * GET /api/wallet
- * Fetches the authenticated user's current verified balance from PostgreSQL.
- */
+// GET /api/wallet
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const walletRes = await query(
@@ -38,11 +35,7 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * POST /api/wallet/credit
- * Atomically adds funds to the user's wallet with PostgreSQL row-level locking (FOR UPDATE)
- * and appends a verified record to the immutable transaction ledger.
- */
+// POST /api/wallet/credit
 router.post('/credit', authenticateToken, async (req, res) => {
   const startTime = Date.now();
   try {
@@ -67,7 +60,6 @@ router.post('/credit', authenticateToken, async (req, res) => {
     const referenceNo = `TXN-CRD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const result = await withTransaction(async (client) => {
-      // 1. Acquire EXCLUSIVE ROW-LEVEL LOCK on the wallet row
       const lockRes = await client.query(
         `SELECT wallet_id, current_balance 
          FROM wallets 
@@ -84,7 +76,6 @@ router.post('/credit', authenticateToken, async (req, res) => {
       const previousBalance = parseFloat(wallet.current_balance);
       const newBalance = roundToTwoDecimals(previousBalance + amount);
 
-      // 2. Update wallet balance
       await client.query(
         `UPDATE wallets 
          SET current_balance = $1, last_updated = CURRENT_TIMESTAMP 
@@ -92,7 +83,6 @@ router.post('/credit', authenticateToken, async (req, res) => {
         [newBalance, wallet.wallet_id]
       );
 
-      // 3. Append to immutable transaction ledger
       const ledgerRes = await client.query(
         `INSERT INTO transaction_ledger 
          (user_id, wallet_id, loan_id, transaction_type, amount, balance_after_transaction, reference_no, remarks)
@@ -129,11 +119,7 @@ router.post('/credit', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * POST /api/wallet/debit
- * Atomically withdraws funds from the wallet.
- * Enforces PostgreSQL row-level locking and prevents balance from going negative.
- */
+// POST /api/wallet/debit
 router.post('/debit', authenticateToken, async (req, res) => {
   const startTime = Date.now();
   try {
@@ -158,7 +144,6 @@ router.post('/debit', authenticateToken, async (req, res) => {
     const referenceNo = `TXN-WDR-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const result = await withTransaction(async (client) => {
-      // 1. Acquire EXCLUSIVE ROW LOCK
       const lockRes = await client.query(
         `SELECT wallet_id, current_balance 
          FROM wallets 
@@ -174,7 +159,6 @@ router.post('/debit', authenticateToken, async (req, res) => {
       const wallet = lockRes.rows[0];
       const currentBalance = parseFloat(wallet.current_balance);
 
-      // 2. Check sufficient balance inside the lock
       if (currentBalance < amount) {
         const error = new Error(`Insufficient funds: Available balance is INR ${currentBalance.toFixed(2)}, required INR ${amount.toFixed(2)}`);
         error.statusCode = 400;
@@ -183,7 +167,6 @@ router.post('/debit', authenticateToken, async (req, res) => {
 
       const newBalance = roundToTwoDecimals(currentBalance - amount);
 
-      // 3. Update wallet balance
       await client.query(
         `UPDATE wallets 
          SET current_balance = $1, last_updated = CURRENT_TIMESTAMP 
@@ -191,7 +174,6 @@ router.post('/debit', authenticateToken, async (req, res) => {
         [newBalance, wallet.wallet_id]
       );
 
-      // 4. Append to transaction ledger
       const ledgerRes = await client.query(
         `INSERT INTO transaction_ledger 
          (user_id, wallet_id, loan_id, transaction_type, amount, balance_after_transaction, reference_no, remarks)

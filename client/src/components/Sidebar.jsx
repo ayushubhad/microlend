@@ -26,7 +26,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   return (
     <aside className="fixed left-0 top-14 bottom-0 w-64 bg-[#fafafa] border-r border-[#ebebeb] z-40 flex flex-col justify-between py-5">
       
-      {/* Top Nav Section */}
+      {/* Navigation */}
       <div className="px-3 flex flex-col gap-2">
         <nav className="flex flex-col gap-0.5">
           {navItems.map((item) => {
@@ -59,7 +59,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         </nav>
       </div>
 
-      {/* Bottom Technical Spec Well (Geist Card) */}
+      {/* System Info */}
       <div className="px-3">
         <div className="p-3 bg-white border border-[#ebebeb] rounded-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col gap-2">
           <div className="flex items-center justify-between">

@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Request logging for DBMS inspection
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
@@ -36,7 +35,7 @@ app.use('/api/ledger', require('./routes/ledger'));
 app.use('/api/inspector', require('./routes/inspector'));
 app.use('/api/admin', require('./routes/admin'));
 
-// Health check endpoint
+// Health Check
 app.get('/api/health', async (req, res) => {
   try {
     const dbRes = await query('SELECT NOW() as current_time, version()');
@@ -65,7 +64,6 @@ async function startServer() {
     console.log('[MicroLend Server] Checking PostgreSQL server readiness...');
     await ensurePostgresRunning();
 
-    // Check if tables are populated; if not, initialize
     const checkTables = await query(`
       SELECT COUNT(*) as count 
       FROM information_schema.tables 

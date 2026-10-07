@@ -8,9 +8,7 @@ export const formatINR = (amt) => {
   });
 };
 
-/**
- * 1. DEPOSIT MODAL (Wallet Credit)
- */
+// Deposit Modal
 export function DepositModal({ isOpen, onClose, onSuccess }) {
   const { token, refreshWallet } = useAuth();
   const [amount, setAmount] = useState('5000');
@@ -123,9 +121,7 @@ export function DepositModal({ isOpen, onClose, onSuccess }) {
   );
 }
 
-/**
- * 2. WITHDRAW MODAL (Wallet Debit)
- */
+// Withdraw Modal
 export function WithdrawModal({ isOpen, onClose, onSuccess }) {
   const { token, wallet, refreshWallet } = useAuth();
   const [amount, setAmount] = useState('2000');
@@ -241,9 +237,7 @@ export function WithdrawModal({ isOpen, onClose, onSuccess }) {
   );
 }
 
-/**
- * 3. APPLY LOAN MODAL (Institutional Micro-Credit Application)
- */
+// Apply Loan Modal
 export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
   const { token, refreshWallet } = useAuth();
   const [loanAmount, setLoanAmount] = useState(product?.minLoanAmount || 10000);
@@ -258,7 +252,6 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
 
   if (!isOpen || !product) return null;
 
-  // Real-time reducing balance amortization preview
   const P = parseFloat(loanAmount) || 0;
   const R = product.interestRate;
   const n = product.loanTermMonths;
@@ -273,7 +266,6 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
     setLoading(true);
     setError(null);
     try {
-      // 1. Submit Application
       const res = await fetch('/api/loans/apply', {
         method: 'POST',
         headers: {
@@ -288,7 +280,6 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
 
-      // 2. Immediate Disbursement for interactive evaluation
       const disburseRes = await fetch(`/api/loans/${data.loan.loanId}/disburse`, {
         method: 'POST',
         headers: {
@@ -355,7 +346,6 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
             </div>
           </div>
 
-          {/* Amortization Calculation Well (Geist Card) */}
           <div className="p-3.5 bg-[#fafafa] border border-[#ebebeb] rounded-[10px] space-y-2 text-xs">
             <div className="flex justify-between text-[#4d4d4d]">
               <span>Monthly EMI:</span>
@@ -397,9 +387,7 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
   );
 }
 
-/**
- * 4. REPAY EMI MODAL (Installment Settlement)
- */
+// Repay EMI Modal
 export function RepayEmiModal({ isOpen, onClose, emi, onSuccess }) {
   const { token, wallet, refreshWallet } = useAuth();
   const [loading, setLoading] = useState(false);

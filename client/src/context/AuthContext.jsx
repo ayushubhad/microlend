@@ -8,12 +8,10 @@ export function AuthProvider({ children }) {
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize or fetch current user on mount or token change
   useEffect(() => {
     if (token) {
       fetchUser(token);
     } else {
-      // Default to Priya Sharma demo for immediate exploration
       login('priya.sharma@example.com', 'Password@123').finally(() => setLoading(false));
     }
   }, [token]);

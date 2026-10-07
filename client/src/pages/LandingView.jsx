@@ -4,11 +4,9 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
   return (
     <div className="flex flex-col gap-16 py-4 max-w-6xl mx-auto">
       
-      {/* 1. HERO BAND (With Iconic Multi-Stop Mesh Gradient) */}
+      {/* Hero Section */}
       <section className="relative rounded-[20px] p-8 sm:p-14 md:p-20 border border-[#ebebeb] overflow-hidden bg-white hero-mesh-gradient">
         <div className="max-w-3xl relative z-10">
-          
-          {/* Eyebrow Label (Geist Mono 12px) */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[100px] bg-white border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] mb-6">
             <span className="w-2 h-2 rounded-full bg-[#171717] animate-pulse"></span>
             <span className="font-geist-mono text-xs uppercase tracking-wider text-[#171717] font-medium">
@@ -16,17 +14,14 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
             </span>
           </div>
 
-          {/* Tightly-Tracked Display Headline (Geist Sans 600, -2.4px tracking) */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#171717] tracking-display-xl leading-[1.05]">
             MicroLend: Secure OLTP Micro-Finance Engine
           </h1>
 
-          {/* Lead Paragraph */}
           <p className="text-[#4d4d4d] text-base sm:text-lg mt-5 leading-relaxed max-w-2xl font-normal">
             A production-grade, strictly relational micro-lending and EMI management system engineered in PostgreSQL with 3NF normalization, ACID transaction boundaries, pessimistic row-level locking, and an immutable audit trail.
           </p>
 
-          {/* Bimodal Marketing Pill Buttons */}
           <div className="flex flex-wrap items-center gap-3 mt-8">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -46,7 +41,7 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
         </div>
       </section>
 
-      {/* 2. INSTITUTIONAL & SPEC STRIP */}
+      {/* Spec Strip */}
       <section className="py-4 border-y border-[#ebebeb] bg-[#fafafa]">
         <div className="flex flex-wrap items-center justify-between gap-6 px-4 text-xs font-geist-mono text-[#8f8f8f]">
           <span className="flex items-center gap-2">
@@ -60,10 +55,8 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
         </div>
       </section>
 
-      {/* 3. ARCHITECTURAL PILLARS (Develop / Preview / Ship Accent Trio) */}
+      {/* Architectural Pillars */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* Pillar 1: Develop (Blue -> Cyan) */}
         <div className="bg-white p-7 rounded-[16px] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all">
           <div>
             <div className="w-full h-1 rounded-full bg-gradient-to-r from-[#007cf0] to-[#00dfd8] mb-5"></div>
@@ -80,7 +73,6 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
           </div>
         </div>
 
-        {/* Pillar 2: Preview (Violet -> Pink) */}
         <div className="bg-white p-7 rounded-[16px] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all">
           <div>
             <div className="w-full h-1 rounded-full bg-gradient-to-r from-[#7928ca] to-[#ff0080] mb-5"></div>
@@ -97,7 +89,6 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
           </div>
         </div>
 
-        {/* Pillar 3: Ship (Red -> Amber) */}
         <div className="bg-white p-7 rounded-[16px] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all">
           <div>
             <div className="w-full h-1 rounded-full bg-gradient-to-r from-[#ff4d4d] to-[#f9cb28] mb-5"></div>
@@ -113,10 +104,9 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
             Trigger: BEFORE UPDATE OR DELETE
           </div>
         </div>
-
       </section>
 
-      {/* 4. CODE BLOCK / SPEC BAND (Geist Code Block) */}
+      {/* Transaction SQL Spec */}
       <section className="bg-white rounded-[16px] p-6 sm:p-8 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="flex items-center justify-between pb-4 border-b border-[#f2f2f2] mb-4">
           <div className="flex items-center gap-2">
@@ -148,7 +138,7 @@ COMMIT;`}
         </pre>
       </section>
 
-      {/* 5. 3NF RELATIONAL ENTITIES OVERVIEW */}
+      {/* Relational Entities */}
       <section className="bg-white rounded-[16px] p-6 sm:p-8 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <h2 className="text-xl font-semibold text-[#171717] tracking-tight mb-1">
           Normalized Relational Entities (3NF)
@@ -190,7 +180,7 @@ COMMIT;`}
         </div>
       </section>
 
-      {/* 6. CALL TO ACTION BAND (cta-band) */}
+      {/* Call to Action */}
       <section className="bg-white rounded-[16px] p-8 sm:p-14 border border-[#ebebeb] text-center flex flex-col items-center justify-center">
         <h2 className="text-3xl sm:text-4xl font-semibold text-[#171717] tracking-display-xl mb-3">
           Explore the Live MicroLend Engine
@@ -207,7 +197,7 @@ COMMIT;`}
         </button>
       </section>
 
-      {/* 7. FOOTER (footer) */}
+      {/* Footer */}
       <footer className="pt-8 pb-12 border-t border-[#ebebeb] flex flex-col sm:flex-row items-center justify-between text-xs text-[#8f8f8f] gap-4 font-geist-mono">
         <div>
           <span>MICROLEND // ACADEMIC DBMS CAPSTONE (AY 2026–27)</span>

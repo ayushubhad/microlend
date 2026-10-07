@@ -34,7 +34,7 @@ export default function InspectorView() {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* Top Banner */}
+      {/* Header */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
@@ -55,7 +55,7 @@ export default function InspectorView() {
         </button>
       </section>
 
-      {/* LIVE RELATIONAL SCHEMA INSPECTOR */}
+      {/* Relational Schema Inspector */}
       {schema && (
         <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4 gap-3">
@@ -66,7 +66,6 @@ export default function InspectorView() {
               </p>
             </div>
 
-            {/* Table Selection Pills */}
             <div className="flex items-center gap-1 flex-wrap">
               {Object.keys(schema).map((tableName) => (
                 <button
@@ -84,7 +83,6 @@ export default function InspectorView() {
             </div>
           </div>
 
-          {/* Active Table Details */}
           {schema[selectedTable] && (
             <div>
               <div className="flex items-center justify-between text-xs font-geist-mono mb-2.5 text-[#8f8f8f]">

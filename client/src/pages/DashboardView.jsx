@@ -6,19 +6,16 @@ export default function DashboardView({ setActiveTab }) {
   const { user, wallet, token, refreshWallet } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
 
-  // Borrower states
   const [loans, setLoans] = useState([]);
   const [upcomingEmis, setUpcomingEmis] = useState([]);
   const [recentTxns, setRecentTxns] = useState([]);
 
-  // Admin Officer states
   const [adminMetrics, setAdminMetrics] = useState(null);
   const [pendingLoans, setPendingLoans] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
-  // Modals state (borrower only)
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [selectedEmiForPay, setSelectedEmiForPay] = useState(null);
@@ -123,14 +120,12 @@ export default function DashboardView({ setActiveTab }) {
     }
   };
 
-  // -------------------------------------------------------------
-  // RENDER: SYSTEM ADMINISTRATOR / LOAN OFFICER DASHBOARD
-  // -------------------------------------------------------------
+  // Admin Officer Dashboard
   if (isAdmin) {
     return (
       <div className="flex flex-col gap-6">
         
-        {/* Officer Identity Well */}
+        {/* Officer Identity */}
         <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-[8px] bg-[#171717] text-white flex items-center justify-center font-semibold text-base">
@@ -171,10 +166,8 @@ export default function DashboardView({ setActiveTab }) {
           </div>
         </section>
 
-        {/* 4 Institutional KPI Metric Cards */}
+        {/* KPI Metric Cards */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          {/* Card 1: Total Disbursed Capital */}
           <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -190,7 +183,6 @@ export default function DashboardView({ setActiveTab }) {
             </div>
           </div>
 
-          {/* Card 2: Active Debt Portfolio */}
           <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -208,7 +200,6 @@ export default function DashboardView({ setActiveTab }) {
             </div>
           </div>
 
-          {/* Card 3: Pending Approvals */}
           <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -235,7 +226,6 @@ export default function DashboardView({ setActiveTab }) {
             </div>
           </div>
 
-          {/* Card 4: Managed Borrowers */}
           <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -259,10 +249,9 @@ export default function DashboardView({ setActiveTab }) {
               </button>
             </div>
           </div>
-
         </section>
 
-        {/* Pending Loan Requests Queue (Quick Action) */}
+        {/* Pending Loan Requests */}
         <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4">
             <div>
@@ -336,7 +325,7 @@ export default function DashboardView({ setActiveTab }) {
           )}
         </section>
 
-        {/* Live Multi-User Ledger Feed */}
+        {/* Transaction Ledger Feed */}
         <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
             <div>
@@ -400,9 +389,7 @@ export default function DashboardView({ setActiveTab }) {
     );
   }
 
-  // -------------------------------------------------------------
-  // RENDER: BORROWER DASHBOARD (Cleaned of fake Aadhaar, Ledger Health card, and security labels)
-  // -------------------------------------------------------------
+  // Borrower Dashboard
   const activeLoan = loans.find(l => l.loanStatus === 'ACTIVE');
   const nextEmi = upcomingEmis[0];
 
@@ -415,7 +402,7 @@ export default function DashboardView({ setActiveTab }) {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* 1. USER PROFILE WELL (Fake Aadhaar removed per Item 4) */}
+      {/* Borrower Profile */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-[8px] bg-[#171717] text-white flex items-center justify-center font-semibold text-base">
@@ -443,7 +430,6 @@ export default function DashboardView({ setActiveTab }) {
           </div>
         </div>
 
-        {/* Quick Deposit & Withdrawal Controls for Borrower */}
         <div className="flex items-center gap-2 self-start md:self-auto">
           <button
             onClick={() => setShowDeposit(true)}
@@ -461,10 +447,8 @@ export default function DashboardView({ setActiveTab }) {
         </div>
       </section>
 
-      {/* 2. 3-CARD FINANCIAL METRIC GRID (Ledger health card removed per Item 5a) */}
+      {/* Financial Overview Cards */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        {/* Card 1: Available Balance */}
         <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -480,7 +464,6 @@ export default function DashboardView({ setActiveTab }) {
           </div>
         </div>
 
-        {/* Card 2: Active Principal */}
         <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -507,7 +490,6 @@ export default function DashboardView({ setActiveTab }) {
           </div>
         </div>
 
-        {/* Card 3: Next EMI Installment */}
         <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -542,10 +524,9 @@ export default function DashboardView({ setActiveTab }) {
             )}
           </div>
         </div>
-
       </section>
 
-      {/* 3. ACTIVE LOAN OVERVIEW */}
+      {/* Active Loan Details */}
       {activeLoan && (
         <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4">
@@ -585,7 +566,7 @@ export default function DashboardView({ setActiveTab }) {
         </section>
       )}
 
-      {/* 4. RECENT FINANCIAL ACTIVITY */}
+      {/* Recent Transactions */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
           <h3 className="font-semibold text-sm text-[#171717]">Recent Transaction History</h3>

@@ -4,10 +4,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
-/**
- * GET /api/admin/metrics
- * Institutional portfolio metrics for the System Administrator / Loan Officer.
- */
+// GET /api/admin/metrics
 router.get('/metrics', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const [loansRes, borrowersRes, pendingRes, ledgerRes] = await Promise.all([
@@ -59,10 +56,7 @@ router.get('/metrics', authenticateToken, requireRole('ADMIN'), async (req, res)
   }
 });
 
-/**
- * GET /api/admin/borrowers
- * Returns all borrower profiles under the administrator's management.
- */
+// GET /api/admin/borrowers
 router.get('/borrowers', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const borrowersRes = await query(`
@@ -105,10 +99,7 @@ router.get('/borrowers', authenticateToken, requireRole('ADMIN'), async (req, re
   }
 });
 
-/**
- * GET /api/admin/borrowers/:id
- * Detailed profile and credit report of a specific borrower.
- */
+// GET /api/admin/borrowers/:id
 router.get('/borrowers/:id', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const borrowerId = req.params.id;

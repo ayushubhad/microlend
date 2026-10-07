@@ -5,10 +5,7 @@ const { roundToTwoDecimals } = require('../services/financial');
 
 const router = express.Router();
 
-/**
- * GET /api/inspector/schema
- * Live DBMS Schema Introspection: returns tables, columns, constraints, and data types.
- */
+// GET /api/inspector/schema
 router.get('/schema', async (req, res) => {
   try {
     const tablesRes = await query(`
@@ -23,7 +20,6 @@ router.get('/schema', async (req, res) => {
     for (const row of tablesRes.rows) {
       const tableName = row.table_name;
 
-      // Columns
       const colRes = await query(`
         SELECT column_name, data_type, is_nullable, column_default
         FROM information_schema.columns
@@ -31,10 +27,8 @@ router.get('/schema', async (req, res) => {
         ORDER BY ordinal_position;
       `, [tableName]);
 
-      // Row count
       const countRes = await query(`SELECT COUNT(*) as count FROM "${tableName}"`);
 
-      // Foreign Keys
       const fkRes = await query(`
         SELECT
             kcu.column_name, 
@@ -69,14 +63,9 @@ router.get('/schema', async (req, res) => {
   }
 });
 
-/**
- * GET /api/inspector/metrics
- * Complex DBMS Aggregations & Group By Queries:
- * Demonstrates SQL aggregations (SUM, AVG, COUNT), joins, and financial ratios.
- */
+// GET /api/inspector/metrics
 router.get('/metrics', async (req, res) => {
   try {
-    // 1. Aggregations on loan accounts
     const loanAggRes = await query(`
       SELECT 
         COUNT(loan_id) as total_loans,
@@ -89,7 +78,6 @@ router.get('/metrics', async (req, res) => {
       FROM loan_accounts
     `);
 
-    // 2. Aggregations on wallets
     const walletAggRes = await query(`
       SELECT 
         COUNT(wallet_id) as total_wallets,
@@ -98,7 +86,6 @@ router.get('/metrics', async (req, res) => {
       FROM wallets
     `);
 
-    // 3. Group By query: Transactions breakdown by type
     const txnGroupRes = await query(`
       SELECT 
         transaction_type,
@@ -109,7 +96,6 @@ router.get('/metrics', async (req, res) => {
       ORDER BY count DESC
     `);
 
-    // 4. Group By query: Loan performance by Product
     const productGroupRes = await query(`
       SELECT 
         p.product_name,
@@ -168,16 +154,9 @@ router.get('/metrics', async (req, res) => {
   }
 });
 
-/**
- * POST /api/inspector/simulate-race-condition
- * Live Demonstration of Concurrency Control & Row-Level Locking:
- * Creates a sandbox test wallet funded with exactly ₹ 500.00,
- * then dispatches two concurrent parallel debit requests of ₹ 400.00 each.
- * Proves that SELECT ... FOR UPDATE blocks and prevents double-spending!
- */
+// POST /api/inspector/simulate-race-condition
 router.post('/simulate-race-condition', async (req, res) => {
   try {
-    // 1. Setup a dedicated temporary test user and wallet for concurrency demonstration
     const testEmail = `concurrency.test.${Date.now()}@microlend.local`;
     const testAadhaar = String(Math.floor(100000000000 + Math.random() * 900000000000));
 
@@ -197,7 +176,6 @@ router.post('/simulate-race-condition', async (req, res) => {
     );
     const walletId = walletRes.rows[0].wallet_id;
 
-    // Helper function that attempts a debit with row-level locking
     const executeDebit = async (threadName, delayMs = 0) => {
       const logs = [];
       const startTime = Date.now();
@@ -208,7 +186,6 @@ router.post('/simulate-race-condition', async (req, res) => {
           logs.push(`[${threadName}] Executing: SELECT current_balance FROM wallets WHERE wallet_id = $1 FOR UPDATE`);
           
           if (delayMs > 0) {
-            // Introduce artificial delay to demonstrate lock contention
             await new Promise(r => setTimeout(r, delayMs));
           }
 
@@ -251,14 +228,11 @@ router.post('/simulate-race-condition', async (req, res) => {
       }
     };
 
-    // Dispatch Thread A and Thread B simultaneously via Promise.all
-    // Thread A holds lock for 100ms before committing; Thread B starts immediately and must wait on lock
     const [resultA, resultB] = await Promise.all([
       executeDebit('Thread_A', 100),
       executeDebit('Thread_B', 0)
     ]);
 
-    // Check final balance
     const finalBalRes = await query(`SELECT current_balance FROM wallets WHERE wallet_id = $1`, [walletId]);
     const finalBalance = parseFloat(finalBalRes.rows[0].current_balance);
 
@@ -283,15 +257,11 @@ router.post('/simulate-race-condition', async (req, res) => {
   }
 });
 
-/**
- * POST /api/inspector/test-trigger-protection
- * Tests that PostgreSQL trigger strictly prevents tampering with transaction_ledger.
- */
+// POST /api/inspector/test-trigger-protection
 router.post('/test-trigger-protection', async (req, res) => {
   try {
     let errorCaught = null;
     try {
-      // Attempt unauthorized modification of ledger
       await query(`UPDATE transaction_ledger SET amount = 0.00 WHERE transaction_id = (SELECT transaction_id FROM transaction_ledger LIMIT 1)`);
     } catch (err) {
       errorCaught = err.message;

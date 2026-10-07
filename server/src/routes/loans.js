@@ -5,10 +5,7 @@ const { calculateEMI, generateAmortizationSchedule, roundToTwoDecimals } = requi
 
 const router = express.Router();
 
-/**
- * POST /api/loans/apply
- * Borrower applies for a loan based on an active product.
- */
+// POST /api/loans/apply
 router.post('/apply', authenticateToken, async (req, res) => {
   try {
     if (req.user.role === 'ADMIN') {
@@ -25,7 +22,6 @@ router.post('/apply', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Product ID and a valid loan amount are required' });
     }
 
-    // 1. Fetch Product rules
     const productRes = await query(
       `SELECT product_id, product_name, interest_rate, loan_term_months, processing_fee, min_loan_amount, max_loan_amount
        FROM loan_products 
@@ -43,7 +39,6 @@ router.post('/apply', authenticateToken, async (req, res) => {
     const rate = parseFloat(product.interest_rate);
     const term = product.loan_term_months;
 
-    // Validate boundaries
     if (amount < minAmt || amount > maxAmt) {
       return res.status(400).json({
         success: false,
@@ -51,10 +46,8 @@ router.post('/apply', authenticateToken, async (req, res) => {
       });
     }
 
-    // Deterministic financial calculation
     const { emi, totalPayable } = calculateEMI(amount, rate, term);
 
-    // Insert loan application in PENDING status
     const insertRes = await query(
       `INSERT INTO loan_accounts 
        (user_id, product_id, loan_amount, interest_rate, emi_amount, total_payable, outstanding_balance, loan_status)
@@ -85,10 +78,7 @@ router.post('/apply', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * GET /api/loans/pending
- * Officer/Admin retrieves all loan applications awaiting review.
- */
+// GET /api/loans/pending
 router.get('/pending', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const loansRes = await query(
@@ -126,10 +116,7 @@ router.get('/pending', authenticateToken, requireRole('ADMIN'), async (req, res)
   }
 });
 
-/**
- * POST /api/loans/:id/approve
- * Admin approves a pending loan application.
- */
+// POST /api/loans/:id/approve
 router.post('/:id/approve', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const loanId = req.params.id;
@@ -163,10 +150,7 @@ router.post('/:id/approve', authenticateToken, requireRole('ADMIN'), async (req,
   }
 });
 
-/**
- * POST /api/loans/:id/reject
- * Admin rejects a pending loan application.
- */
+// POST /api/loans/:id/reject
 router.post('/:id/reject', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const loanId = req.params.id;
@@ -201,23 +185,13 @@ router.post('/:id/reject', authenticateToken, requireRole('ADMIN'), async (req, 
   }
 });
 
-/**
- * POST /api/loans/:id/disburse
- * Full ACID Transaction:
- * - Locks borrower's wallet & loan account
- * - Calculates processing fee
- * - Credits net disbursed amount to wallet
- * - Generates exact amortization schedule (1..N installments)
- * - Updates loan status to ACTIVE
- * - Inserts immutable LOAN_DISBURSEMENT entry in transaction_ledger
- */
+// POST /api/loans/:id/disburse
 router.post('/:id/disburse', authenticateToken, async (req, res) => {
   const startTime = Date.now();
   try {
     const loanId = req.params.id;
 
     const result = await withTransaction(async (client) => {
-      // 1. Lock the loan row
       const loanRes = await client.query(
         `SELECT l.loan_id, l.user_id, l.product_id, l.loan_amount, l.interest_rate, l.emi_amount, 
                 l.total_payable, l.loan_status, p.product_name, p.loan_term_months, p.processing_fee
@@ -234,7 +208,6 @@ router.post('/:id/disburse', authenticateToken, async (req, res) => {
 
       const loan = loanRes.rows[0];
 
-      // Only borrower themselves or admin can trigger disbursement
       if (req.user.role !== 'ADMIN' && req.user.userId !== loan.user_id) {
         throw new Error('Unauthorized to disburse this loan');
       }
@@ -243,7 +216,6 @@ router.post('/:id/disburse', authenticateToken, async (req, res) => {
         throw new Error(`Cannot disburse loan: Current status is '${loan.loan_status}'`);
       }
 
-      // 2. Lock borrower wallet
       const walletRes = await client.query(
         `SELECT wallet_id, current_balance FROM wallets WHERE user_id = $1 FOR UPDATE`,
         [loan.user_id]
@@ -261,13 +233,11 @@ router.post('/:id/disburse', authenticateToken, async (req, res) => {
       const previousWalletBalance = parseFloat(wallet.current_balance);
       const newWalletBalance = roundToTwoDecimals(previousWalletBalance + netDisbursed);
 
-      // 3. Credit wallet
       await client.query(
         `UPDATE wallets SET current_balance = $1, last_updated = CURRENT_TIMESTAMP WHERE wallet_id = $2`,
         [newWalletBalance, wallet.wallet_id]
       );
 
-      // 4. Generate amortization schedule
       const startDate = new Date();
       const schedule = generateAmortizationSchedule(principal, loan.interest_rate, loan.loan_term_months, startDate);
 
@@ -280,7 +250,6 @@ router.post('/:id/disburse', authenticateToken, async (req, res) => {
         );
       }
 
-      // 5. Update loan account to ACTIVE
       const endDate = schedule[schedule.length - 1].dueDate;
       await client.query(
         `UPDATE loan_accounts 
@@ -292,7 +261,6 @@ router.post('/:id/disburse', authenticateToken, async (req, res) => {
         [endDate, principal, loan.loan_id]
       );
 
-      // 6. Record immutable transaction in ledger
       const referenceNo = `TXN-DISB-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
       const remarks = `Loan disbursement: INR ${principal.toFixed(2)} principal less INR ${processingFee.toFixed(2)} processing fee`;
 
@@ -332,10 +300,7 @@ router.post('/:id/disburse', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * GET /api/loans/my-loans
- * Lists loans for the authenticated borrower.
- */
+// GET /api/loans/my-loans
 router.get('/my-loans', authenticateToken, async (req, res) => {
   try {
     const loansRes = await query(
@@ -376,10 +341,7 @@ router.get('/my-loans', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * GET /api/loans/:id
- * Fetches specific loan details with its full EMI amortization schedule.
- */
+// GET /api/loans/:id
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const loanRes = await query(
@@ -399,12 +361,10 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
     const loan = loanRes.rows[0];
 
-    // Authorization check: User can view only their own loan unless ADMIN
     if (req.user.role !== 'ADMIN' && req.user.userId !== loan.user_id) {
       return res.status(403).json({ success: false, error: 'Forbidden: You do not have access to this loan' });
     }
 
-    // Fetch EMI schedule
     const emiRes = await query(
       `SELECT emi_id, emi_number, due_date, emi_amount, principal_component, 
               interest_component, amount_paid, payment_status, paid_date
@@ -449,10 +409,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * GET /api/loans (ADMIN ONLY)
- * Lists all loans across the institution.
- */
+// GET /api/loans
 router.get('/', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const loansRes = await query(

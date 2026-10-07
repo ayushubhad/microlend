@@ -4,10 +4,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
-/**
- * GET /api/ledger/my-history
- * Borrower views their personal immutable financial audit trail.
- */
+// GET /api/ledger/my-history
 router.get('/my-history', authenticateToken, async (req, res) => {
   try {
     const isAdmin = req.user.role === 'ADMIN';
@@ -52,10 +49,7 @@ router.get('/my-history', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * GET /api/ledger/all
- * Institutional ledger across all managed users for administrator.
- */
+// GET /api/ledger/all
 router.get('/all', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const ledgerRes = await query(
@@ -92,10 +86,7 @@ router.get('/all', authenticateToken, requireRole('ADMIN'), async (req, res) => 
   }
 });
 
-/**
- * GET /api/ledger/audit
- * Administrative system-wide audit view across all users and wallets.
- */
+// GET /api/ledger/audit
 router.get('/audit', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const { type, limit = 50, offset = 0 } = req.query;
@@ -139,12 +130,7 @@ router.get('/audit', authenticateToken, requireRole('ADMIN'), async (req, res) =
   }
 });
 
-/**
- * GET /api/ledger/reconciliation
- * Mathematical proof of ledger integrity:
- * Reconstructs wallet balance from first principles by summing all historical transactions
- * and compares it against current wallet balance.
- */
+// GET /api/ledger/reconciliation
 router.get('/reconciliation', authenticateToken, async (req, res) => {
   try {
     const targetUserId = req.user.role === 'ADMIN' && req.query.userId ? req.query.userId : req.user.userId;

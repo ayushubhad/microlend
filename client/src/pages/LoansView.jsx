@@ -59,7 +59,7 @@ export default function LoansView({ setActiveTab }) {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* Top Banner */}
+      {/* Header */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
@@ -82,7 +82,7 @@ export default function LoansView({ setActiveTab }) {
         )}
       </section>
 
-      {/* Loan Selection Cards or Empty State */}
+      {/* Loan List */}
       {loans.length === 0 ? (
         <section className="bg-white rounded-[12px] p-12 text-center border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <span className="material-symbols-outlined text-3xl text-[#8f8f8f] mb-2 block">credit_card_off</span>
@@ -99,8 +99,6 @@ export default function LoansView({ setActiveTab }) {
         </section>
       ) : (
         <div className="flex flex-col gap-6">
-          
-          {/* Loan Account Cards (Geist Tiles) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loans.map((l) => {
               const isSelected = selectedLoanId === l.loanId;
@@ -137,7 +135,7 @@ export default function LoansView({ setActiveTab }) {
             })}
           </div>
 
-          {/* Detailed Amortization Table */}
+          {/* Amortization Table */}
           {loanDetails && (
             <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4 gap-2">

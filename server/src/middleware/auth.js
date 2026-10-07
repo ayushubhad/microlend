@@ -2,9 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'microlend-super-secure-jwt-secret-key-vit-2026';
 
-/**
- * Middleware to verify JWT authentication token
- */
+// Authenticate Token Middleware
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -24,14 +22,12 @@ function authenticateToken(req, res, next) {
       });
     }
 
-    req.user = decoded; // { userId, email, role, fullName }
+    req.user = decoded;
     next();
   });
 }
 
-/**
- * Middleware to require a specific role (e.g. 'ADMIN')
- */
+// Require Role Middleware
 function requireRole(role) {
   return (req, res, next) => {
     if (!req.user || req.user.role !== role) {

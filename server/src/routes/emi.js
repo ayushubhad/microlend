@@ -5,20 +5,13 @@ const { roundToTwoDecimals } = require('../services/financial');
 
 const router = express.Router();
 
-/**
- * POST /api/emi/:emiId/pay
- * Core ACID Transaction with Multi-Row Locking:
- * Locks Wallet -> Locks Loan Account -> Locks EMI Schedule
- * Deducts EMI from wallet, amortizes outstanding loan balance,
- * updates installment status to 'PAID', and logs to immutable ledger.
- */
+// POST /api/emi/:emiId/pay
 router.post('/:emiId/pay', authenticateToken, async (req, res) => {
   const startTime = Date.now();
   try {
     const { emiId } = req.params;
 
     const result = await withTransaction(async (client) => {
-      // 1. Fetch and Lock Target EMI Row
       const emiRes = await client.query(
         `SELECT e.emi_id, e.loan_id, e.emi_number, e.due_date, e.emi_amount, 
                 e.principal_component, e.interest_component, e.payment_status,
@@ -36,7 +29,6 @@ router.post('/:emiId/pay', authenticateToken, async (req, res) => {
 
       const emi = emiRes.rows[0];
 
-      // Authorization check
       if (req.user.role !== 'ADMIN' && req.user.userId !== emi.user_id) {
         throw new Error('Forbidden: You can only pay installments for your own loan');
       }
@@ -50,7 +42,6 @@ router.post('/:emiId/pay', authenticateToken, async (req, res) => {
       const emiAmount = parseFloat(emi.emi_amount);
       const principalComp = parseFloat(emi.principal_component);
 
-      // 2. Lock User Wallet (Deterministic Lock Ordering to prevent deadlocks)
       const walletRes = await client.query(
         `SELECT wallet_id, current_balance 
          FROM wallets 
@@ -66,25 +57,21 @@ router.post('/:emiId/pay', authenticateToken, async (req, res) => {
       const wallet = walletRes.rows[0];
       const walletBalance = parseFloat(wallet.current_balance);
 
-      // 3. Strict Balance Validation inside transaction
       if (walletBalance < emiAmount) {
         const error = new Error(`Insufficient wallet balance: Available INR ${walletBalance.toFixed(2)}, required INR ${emiAmount.toFixed(2)}`);
         error.statusCode = 400;
         throw error;
       }
 
-      // 4. Calculate new balances
       const newWalletBalance = roundToTwoDecimals(walletBalance - emiAmount);
       const currentOutstanding = parseFloat(emi.outstanding_balance);
       const newOutstanding = Math.max(0.00, roundToTwoDecimals(currentOutstanding - principalComp));
 
-      // 5. Update Wallet
       await client.query(
         `UPDATE wallets SET current_balance = $1, last_updated = CURRENT_TIMESTAMP WHERE wallet_id = $2`,
         [newWalletBalance, wallet.wallet_id]
       );
 
-      // 6. Mark EMI as PAID
       await client.query(
         `UPDATE emi_schedules 
          SET payment_status = 'PAID', amount_paid = $1, paid_date = CURRENT_TIMESTAMP 
@@ -92,10 +79,8 @@ router.post('/:emiId/pay', authenticateToken, async (req, res) => {
         [emiAmount, emi.emi_id]
       );
 
-      // 7. Update Loan Outstanding Balance
       let isLoanClosed = false;
       if (newOutstanding <= 0.00) {
-        // Also verify no other pending EMIs remain
         const pendingCountRes = await client.query(
           `SELECT COUNT(*) FROM emi_schedules WHERE loan_id = $1 AND payment_status != 'PAID' AND emi_id != $2`,
           [emi.loan_id, emi.emi_id]
@@ -113,7 +98,6 @@ router.post('/:emiId/pay', authenticateToken, async (req, res) => {
         [newOutstanding, isLoanClosed, emi.loan_id]
       );
 
-      // 8. Append to immutable Transaction Ledger
       const referenceNo = `TXN-EMI-${emi.emi_number}-${Date.now()}`;
       const remarks = `EMI payment installment #${emi.emi_number} (Principal: INR ${principalComp.toFixed(2)}, Interest: INR ${parseFloat(emi.interest_component).toFixed(2)})`;
 
@@ -154,10 +138,7 @@ router.post('/:emiId/pay', authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * GET /api/emi/upcoming
- * Retrieves upcoming pending EMIs for the logged-in borrower across active loans.
- */
+// GET /api/emi/upcoming
 router.get('/upcoming', authenticateToken, async (req, res) => {
   try {
     const upcomingRes = await query(

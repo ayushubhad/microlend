@@ -6,15 +6,11 @@ const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
 
 const router = express.Router();
 
-/**
- * POST /api/auth/register
- * Atomically registers a user and provisions their digital wallet.
- */
+// POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
     const { full_name, email, phone_number, password, address, aadhaar_number, initial_deposit } = req.body;
 
-    // Strict validation
     if (!full_name || !email || !phone_number || !password || !address || !aadhaar_number) {
       return res.status(400).json({
         success: false,
@@ -36,7 +32,6 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Check unique email and aadhaar before transaction
     const existing = await query(
       'SELECT email, aadhaar_number, phone_number FROM users WHERE email = $1 OR aadhaar_number = $2 OR phone_number = $3',
       [email.toLowerCase().trim(), aadhaar_number, phone_number]
@@ -59,9 +54,7 @@ router.post('/register', async (req, res) => {
     const password_hash = await bcrypt.hash(password, salt);
     const startingBalance = parseFloat(initial_deposit) > 0 ? parseFloat(initial_deposit) : 0.00;
 
-    // ATOMIC REGISTRATION + WALLET PROVISIONING
     const result = await withTransaction(async (client) => {
-      // 1. Insert User
       const userRes = await client.query(
         `INSERT INTO users (full_name, email, phone_number, password_hash, role, address, aadhaar_number, wallet_balance)
          VALUES ($1, $2, $3, $4, 'USER', $5, $6, $7)
@@ -70,7 +63,6 @@ router.post('/register', async (req, res) => {
       );
       const user = userRes.rows[0];
 
-      // 2. Insert Wallet
       const walletRes = await client.query(
         `INSERT INTO wallets (user_id, current_balance)
          VALUES ($1, $2)
@@ -79,7 +71,6 @@ router.post('/register', async (req, res) => {
       );
       const wallet = walletRes.rows[0];
 
-      // 3. If initial deposit was made, create initial ledger transaction
       if (startingBalance > 0) {
         await client.query(
           `INSERT INTO transaction_ledger (user_id, wallet_id, transaction_type, amount, balance_after_transaction, reference_no, remarks)
@@ -98,7 +89,6 @@ router.post('/register', async (req, res) => {
       return { user, wallet };
     });
 
-    // Generate JWT
     const token = jwt.sign(
       {
         userId: result.user.user_id,
@@ -129,10 +119,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-/**
- * POST /api/auth/login
- * Verifies credentials, computes current balance, and returns JWT.
- */
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -192,10 +179,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-/**
- * GET /api/auth/me
- * Returns current authenticated user and real-time wallet balance.
- */
+// GET /api/auth/me
 router.get('/me', authenticateToken, async (req, res) => {
   try {
     const userRes = await query(

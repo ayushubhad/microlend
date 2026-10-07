@@ -27,13 +27,12 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#fafafa]/90 backdrop-blur-md border-b border-[#ebebeb] h-14">
       <div className="h-full px-6 flex items-center justify-between max-w-7xl mx-auto">
         
-        {/* Left: Vercel Delta Brand & Breadcrumb */}
+        {/* Brand */}
         <div className="flex items-center gap-4">
           <div 
             onClick={() => setActiveTab('dashboard')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
-            {/* Iconic Vercel Delta Glyph */}
             <div className="w-6 h-6 flex items-center justify-center">
               <svg width="18" height="16" viewBox="0 0 76 65" fill="#171717">
                 <path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/>
@@ -49,10 +48,8 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
           </span>
         </div>
 
-        {/* Right: Balance / Role Status & Persona Controls */}
+        {/* User Controls */}
         <div className="flex items-center gap-3">
-          
-          {/* Status Badge: Balance for Borrowers, Officer Badge for Admins */}
           {user && (
             isAdmin ? (
               <div className="flex items-center gap-2 px-2.5 py-1 bg-white border border-[#ebebeb] rounded-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.03)]">
@@ -72,7 +69,6 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
             )
           )}
 
-          {/* User Persona / Account Switcher */}
           {user ? (
             <div className="relative">
               <button
@@ -88,7 +84,6 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                 <span className="material-symbols-outlined text-[#8f8f8f] text-base">expand_more</span>
               </button>
 
-              {/* Elevated Floating Dropdown Menu */}
               {showPersonaMenu && (
                 <div className="absolute right-0 mt-2 w-72 bg-white rounded-[12px] shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-[#ebebeb] py-2 z-50">
                   <div className="px-3.5 py-2 border-b border-[#f2f2f2]">
@@ -96,7 +91,6 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                     <p className="text-xs text-[#4d4d4d] mt-0.5">Toggle between borrower and administrator</p>
                   </div>
 
-                  {/* Persona 1: Priya Sharma */}
                   <button
                     onClick={() => handleSwitchPersona('priya.sharma@example.com', 'Password@123')}
                     className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'priya.sharma@example.com' ? 'bg-[#f7f7f7]' : ''}`}
@@ -110,7 +104,6 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                     )}
                   </button>
 
-                  {/* Persona 2: Admin */}
                   <button
                     onClick={() => handleSwitchPersona('admin@microlend.org', 'AdminPassword@123')}
                     className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.role === 'ADMIN' ? 'bg-[#f7f7f7]' : ''}`}
@@ -124,7 +117,6 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                     )}
                   </button>
 
-                  {/* Persona 3: Dr. Arvind Rao */}
                   <button
                     onClick={() => handleSwitchPersona('arvind.rao@example.com', 'Password@123')}
                     className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'arvind.rao@example.com' ? 'bg-[#f7f7f7]' : ''}`}

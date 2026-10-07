@@ -4,10 +4,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
-/**
- * GET /api/products
- * Public or authenticated: Lists all available institutional loan products.
- */
+// GET /api/products
 router.get('/', async (req, res) => {
   try {
     const productsRes = await query(
@@ -35,9 +32,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * GET /api/products/:id
- */
+// GET /api/products/:id
 router.get('/:id', async (req, res) => {
   try {
     const productRes = await query(
@@ -72,10 +67,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-/**
- * POST /api/products
- * Restricted to ADMIN: Creates a new loan product offering.
- */
+// POST /api/products
 router.post('/', authenticateToken, requireRole('ADMIN'), async (req, res) => {
   try {
     const {

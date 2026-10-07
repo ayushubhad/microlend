@@ -8,7 +8,6 @@ export default function WalletView() {
   const [recon, setRecon] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Modals state
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
 
@@ -41,7 +40,7 @@ export default function WalletView() {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* Primary Wallet Banner (Geist Hero Card) */}
+      {/* Header */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
@@ -80,7 +79,7 @@ export default function WalletView() {
         )}
       </section>
 
-      {/* Automated Ledger Reconciliation Card */}
+      {/* Reconciliation Audit */}
       {recon && (
         <section className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
