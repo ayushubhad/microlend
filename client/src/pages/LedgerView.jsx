@@ -3,40 +3,31 @@ import { useAuth } from '../context/AuthContext';
 import { formatINR } from '../components/Modals';
 
 export default function LedgerView() {
-  const { user, token } = useAuth();
+  const { token, user } = useAuth();
   const [transactions, setTransactions] = useState([]);
-  const [filterType, setFilterType] = useState('ALL');
   const [recon, setRecon] = useState(null);
+  const [filterType, setFilterType] = useState('ALL');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (token) {
-      loadLedgerData();
+      loadLedger();
     }
-  }, [token, user?.role, filterType]);
+  }, [token]);
 
-  const loadLedgerData = async () => {
+  const loadLedger = async () => {
     setLoading(true);
     try {
-      let endpoint = user?.role === 'ADMIN' ? '/api/ledger/audit' : '/api/ledger/my-history';
-      if (user?.role === 'ADMIN' && filterType !== 'ALL') {
-        endpoint += `?type=${filterType}`;
-      }
-
-      const [ledgerRes, reconRes] = await Promise.all([
+      const endpoint = user?.role === 'ADMIN' ? '/api/ledger/all' : '/api/ledger/my-history';
+      const [txnsRes, reconRes] = await Promise.all([
         fetch(endpoint, { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/ledger/reconciliation', { headers: { Authorization: `Bearer ${token}` } })
       ]);
-
-      const ledgerData = await ledgerRes.json();
+      const txnsData = await txnsRes.json();
       const reconData = await reconRes.json();
 
-      if (ledgerData.success) {
-        setTransactions(ledgerData.auditLog || ledgerData.transactions || []);
-      }
-      if (reconData.success) {
-        setRecon(reconData.reconciliation);
-      }
+      if (txnsData.success) setTransactions(txnsData.transactions || []);
+      if (reconData.success) setRecon(reconData.reconciliation);
     } catch (err) {
       console.error('Ledger fetch error:', err);
     } finally {
@@ -53,30 +44,29 @@ export default function LedgerView() {
     <div className="flex flex-col gap-6">
       
       {/* Banner */}
-      <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-indigo-600 text-xs font-semibold uppercase tracking-wider mb-1">
-            <span className="material-symbols-outlined text-base">receipt_long</span>
-            <span>Account Statement &amp; Ledger</span>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900">
-            {user?.role === 'ADMIN' ? 'Institutional System Audit Trail' : 'Transaction History & Statement'}
+          <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
+            Immutable Audit Trail
+          </span>
+          <h2 className="text-xl font-semibold text-[#171717] tracking-tight">
+            {user?.role === 'ADMIN' ? 'System Transaction Ledger' : 'My Financial Statement'}
           </h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Tamper-evident transaction history with immutable ledger records, reference tracking, and audit-grade timestamps.
+          <p className="text-xs text-[#4d4d4d] mt-1">
+            Append-only financial records protected by PostgreSQL triggers against modification or deletion.
           </p>
         </div>
 
-        {/* Filter Chips */}
+        {/* Filter Pills (Geist Category Tab Pills) */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {['ALL', 'WALLET_CREDIT', 'WALLET_DEBIT', 'LOAN_DISBURSEMENT', 'EMI_PAYMENT'].map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`px-3 py-1 rounded-[64px] text-xs font-normal transition-colors border ${
                 filterType === type
-                  ? 'bg-blue-600 text-white shadow-2xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-[#171717] text-white border-[#171717]'
+                  : 'bg-white text-[#4d4d4d] border-[#ebebeb] hover:border-[#a1a1a1]'
               }`}
             >
               {type.replace('_', ' ')}
@@ -87,109 +77,85 @@ export default function LedgerView() {
 
       {/* Balance Reconciliation Audit Card */}
       {recon && (
-        <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl border border-emerald-100">
-              <span className="material-symbols-outlined text-2xl">verified</span>
+        <section className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-sm text-[#171717]">Mathematical Ledger Verification</span>
+              <span className="font-geist-mono text-[10px] text-[#10b981] px-1.5 py-0.2 rounded-[4px] border border-[#d1ebd1] bg-[#f7faf7] font-medium">
+                {recon.status}
+              </span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-slate-900 text-base">Automated Balance Reconciliation</h4>
-                <span className="text-[10px] font-mono-num font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  {recon.status}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Formula: Current Wallet Balance = Σ (Credits) − Σ (Debits) from first transaction to present.
-              </p>
-            </div>
+            <p className="text-xs text-[#4d4d4d] mt-1">
+              Calculated Ledger Balance matches Stored Wallet Balance ({formatINR(recon.storedWalletBalance)}) with zero drift across {recon.totalTransactionsAudited} rows.
+            </p>
           </div>
 
-          <div className="flex items-center gap-6 font-mono-num text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div className="flex items-center gap-4 text-xs font-geist-mono self-start md:self-auto">
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block">Stored Balance</span>
-              <span className="font-bold text-slate-900 text-sm">{formatINR(recon.storedWalletBalance)}</span>
+              <span className="text-[#8f8f8f] block text-[10px] uppercase">Net Credits</span>
+              <span className="font-semibold text-[#10b981]">{formatINR(recon.totalCredits)}</span>
             </div>
-            <div className="text-slate-400">=</div>
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block">Sum of Ledger</span>
-              <span className="font-bold text-blue-600 text-sm">{formatINR(recon.computedLedgerBalance)}</span>
+              <span className="text-[#8f8f8f] block text-[10px] uppercase">Net Debits</span>
+              <span className="font-semibold text-[#171717]">{formatINR(recon.totalDebits)}</span>
             </div>
-            <div className="h-6 w-px bg-slate-200"></div>
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block">Discrepancy</span>
-              <span className="font-bold text-emerald-600 text-sm">₹ 0.00</span>
+              <span className="text-[#8f8f8f] block text-[10px] uppercase">Discrepancy</span>
+              <span className="font-semibold text-[#171717]">{formatINR(recon.difference)}</span>
             </div>
           </div>
         </section>
       )}
 
-      {/* Immutable Ledger Table */}
-      <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Showing {filteredTxns.length} Immutable Ledger Records
+      {/* Ledger Table */}
+      <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
+          <h3 className="font-semibold text-sm text-[#171717]">
+            Ledger Entries ({filteredTxns.length})
+          </h3>
+          <span className="font-geist-mono text-xs text-[#8f8f8f]">
+            FILTER: {filterType}
           </span>
-          <span className="text-[11px] font-mono-num text-slate-400">PostgreSQL table: transaction_ledger</span>
         </div>
 
         {filteredTxns.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 text-xs">No records matching selected criteria.</div>
+          <div className="text-center py-10 text-[#8f8f8f] text-xs font-geist-mono">NO RECORDS FOUND</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-200">
-                  <th className="py-3 px-3">Unique Ref No</th>
-                  {user?.role === 'ADMIN' && <th className="py-3 px-3">Account Holder</th>}
-                  <th className="py-3 px-3">Transaction Type</th>
-                  <th className="py-3 px-3">Transfer Amount</th>
-                  <th className="py-3 px-3">Post-Balance</th>
-                  <th className="py-3 px-3">Timestamp (UTC/IST)</th>
-                  <th className="py-3 px-3">Ledger Remarks</th>
+                <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
+                  <th className="py-2 px-3 font-medium">Reference Code</th>
+                  <th className="py-2 px-3 font-medium">Operation</th>
+                  <th className="py-2 px-3 font-medium">Amount</th>
+                  <th className="py-2 px-3 font-medium">Balance After</th>
+                  <th className="py-2 px-3 font-medium">Timestamp</th>
+                  <th className="py-2 px-3 font-medium">Remarks</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-mono-num">
+              <tbody className="divide-y divide-[#f2f2f2] font-mono-num">
                 {filteredTxns.map((t) => (
-                  <tr key={t.transactionId} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-blue-600 font-mono-num">
-                      {t.referenceNo}
-                    </td>
-
-                    {user?.role === 'ADMIN' && (
-                      <td className="py-3 px-3 font-sans">
-                        <p className="font-semibold text-slate-900">{t.userName || 'Borrower'}</p>
-                        <p className="text-[10px] text-slate-400 font-mono-num">{t.userEmail}</p>
-                      </td>
-                    )}
-
-                    <td className="py-3 px-3">
-                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
-                        t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT')
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}>
+                  <tr key={t.transactionId} className="hover:bg-[#fafafa] transition-colors">
+                    <td className="py-2.5 px-3 font-medium text-[#171717]">{t.referenceNo}</td>
+                    <td className="py-2.5 px-3">
+                      <span className="font-geist-mono text-[10px] px-1.5 py-0.5 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#4d4d4d]">
                         {t.transactionType}
                       </span>
                     </td>
-
-                    <td className={`py-3 px-3 font-bold ${
+                    <td className={`py-2.5 px-3 font-medium ${
                       t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT')
-                        ? 'text-emerald-600'
-                        : 'text-slate-900'
+                        ? 'text-[#10b981]'
+                        : 'text-[#171717]'
                     }`}>
                       {t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT') ? '+' : '-'} {formatINR(t.amount)}
                     </td>
-
-                    <td className="py-3 px-3 font-semibold text-slate-700">
+                    <td className="py-2.5 px-3 text-[#4d4d4d]">
                       {formatINR(t.balanceAfter)}
                     </td>
-
-                    <td className="py-3 px-3 text-slate-500 text-[11px]">
+                    <td className="py-2.5 px-3 text-[#8f8f8f] text-[11px]">
                       {new Date(t.transactionDate).toLocaleString()}
                     </td>
-
-                    <td className="py-3 px-3 text-slate-600 font-sans text-xs">
+                    <td className="py-2.5 px-3 text-[#4d4d4d] font-sans text-xs">
                       {t.remarks}
                     </td>
                   </tr>

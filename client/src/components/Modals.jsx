@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-// Helper for currency formatting
 export const formatINR = (amt) => {
   return '₹ ' + (amt || 0).toLocaleString('en-IN', {
     minimumFractionDigits: 2,
@@ -15,7 +14,7 @@ export const formatINR = (amt) => {
 export function DepositModal({ isOpen, onClose, onSuccess }) {
   const { token, refreshWallet } = useAuth();
   const [amount, setAmount] = useState('5000');
-  const [remarks, setRemarks] = useState('Digital NetBanking Top-Up');
+  const [remarks, setRemarks] = useState('UPI Wallet Deposit');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -48,37 +47,31 @@ export function DepositModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B192C]/60 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <span className="material-symbols-outlined text-xl">add_circle</span>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-base">Add Funds to Wallet</h3>
-              <p className="text-[11px] text-slate-500 font-mono-num">Instant deposit via UPI / Net Banking</p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px] p-4">
+      <div className="bg-white rounded-[16px] max-w-md w-full p-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-[#ebebeb]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2]">
+          <div>
+            <h3 className="font-semibold text-base text-[#171717] tracking-tight">Deposit Funds</h3>
+            <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">INSTANT CREDIT // POSTGRESQL WALLET</p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <span className="material-symbols-outlined text-xl">close</span>
+          <button onClick={onClose} className="text-[#8f8f8f] hover:text-[#171717] p-1">
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">error</span>
+          <div className="mt-3 p-2.5 rounded-[6px] bg-[#fff5f5] border border-[#ffcccc] text-[#ee0000] text-xs">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f] block mb-1">
               Deposit Amount (INR)
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8f8f] text-sm">₹</span>
               <input
                 type="number"
                 step="0.01"
@@ -86,49 +79,42 @@ export function DepositModal({ isOpen, onClose, onSuccess }) {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
-                className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono-num text-sm text-slate-900 font-bold"
+                className="input-geist w-full pl-7 font-mono-num text-sm text-[#171717]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-              Transaction Remarks
+            <label className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f] block mb-1">
+              Payment Remarks
             </label>
             <input
               type="text"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs text-slate-800"
+              className="input-geist w-full text-xs text-[#171717]"
             />
           </div>
 
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600 flex items-center gap-2">
-            <span className="material-symbols-outlined text-emerald-600 text-base">verified_user</span>
-            <span>Funds are credited instantly with an automated transaction receipt.</span>
+          <div className="p-3 bg-[#fafafa] border border-[#ebebeb] rounded-[8px] text-[11px] text-[#4d4d4d] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+            <span>Appends immutable transaction record with verifiable reference number.</span>
           </div>
 
-          <div className="pt-2 flex gap-3">
+          <div className="pt-2 flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 font-medium text-xs hover:bg-slate-50 transition-colors"
+              className="flex-1 py-2 px-3 rounded-[6px] border border-[#ebebeb] text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] text-xs font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              className="flex-1 py-2 px-3 rounded-[6px] bg-[#171717] hover:bg-[#333333] text-white text-xs font-medium transition-colors shadow-sm disabled:opacity-50"
             >
-              {loading ? (
-                <span>Processing Deposit...</span>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-sm">payments</span>
-                  <span>Confirm Deposit</span>
-                </>
-              )}
+              {loading ? 'Processing...' : 'Confirm Deposit'}
             </button>
           </div>
         </form>
@@ -143,7 +129,7 @@ export function DepositModal({ isOpen, onClose, onSuccess }) {
 export function WithdrawModal({ isOpen, onClose, onSuccess }) {
   const { token, wallet, refreshWallet } = useAuth();
   const [amount, setAmount] = useState('2000');
-  const [remarks, setRemarks] = useState('ATM/Vendor Withdrawal');
+  const [remarks, setRemarks] = useState('Bank Account Payout');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -176,37 +162,33 @@ export function WithdrawModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B192C]/60 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <span className="material-symbols-outlined text-xl">payments</span>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-base">Withdraw From Wallet</h3>
-              <p className="text-[11px] text-slate-500 font-mono-num">Current: {formatINR(wallet?.currentBalance)}</p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px] p-4">
+      <div className="bg-white rounded-[16px] max-w-md w-full p-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-[#ebebeb]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2]">
+          <div>
+            <h3 className="font-semibold text-base text-[#171717] tracking-tight">Withdraw Funds</h3>
+            <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+              AVAILABLE: {formatINR(wallet?.currentBalance)}
+            </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <span className="material-symbols-outlined text-xl">close</span>
+          <button onClick={onClose} className="text-[#8f8f8f] hover:text-[#171717] p-1">
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">error</span>
+          <div className="mt-3 p-2.5 rounded-[6px] bg-[#fff5f5] border border-[#ffcccc] text-[#ee0000] text-xs">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f] block mb-1">
               Withdrawal Amount (INR)
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8f8f] text-sm">₹</span>
               <input
                 type="number"
                 step="0.01"
@@ -215,49 +197,42 @@ export function WithdrawModal({ isOpen, onClose, onSuccess }) {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
-                className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono-num text-sm text-slate-900 font-bold"
+                className="input-geist w-full pl-7 font-mono-num text-sm text-[#171717]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-              Reason / Remarks
+            <label className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f] block mb-1">
+              Destination / Purpose
             </label>
             <input
               type="text"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs text-slate-800"
+              className="input-geist w-full text-xs text-[#171717]"
             />
           </div>
 
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600 flex items-center gap-2">
-            <span className="material-symbols-outlined text-blue-600 text-base">shield</span>
-            <span>Transfers are processed securely with zero settlement delay.</span>
+          <div className="p-3 bg-[#fafafa] border border-[#ebebeb] rounded-[8px] text-[11px] text-[#4d4d4d] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0070f3]"></span>
+            <span>Pessimistic row-level lock protects against concurrent overdrafts.</span>
           </div>
 
-          <div className="pt-2 flex gap-3">
+          <div className="pt-2 flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 font-medium text-xs hover:bg-slate-50 transition-colors"
+              className="flex-1 py-2 px-3 rounded-[6px] border border-[#ebebeb] text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] text-xs font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              className="flex-1 py-2 px-3 rounded-[6px] bg-[#171717] hover:bg-[#333333] text-white text-xs font-medium transition-colors shadow-sm disabled:opacity-50"
             >
-              {loading ? (
-                <span>Processing Withdrawal...</span>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-sm">check_circle</span>
-                  <span>Confirm Withdrawal</span>
-                </>
-              )}
+              {loading ? 'Processing...' : 'Confirm Withdrawal'}
             </button>
           </div>
         </form>
@@ -267,7 +242,7 @@ export function WithdrawModal({ isOpen, onClose, onSuccess }) {
 }
 
 /**
- * 3. APPLY LOAN MODAL
+ * 3. APPLY LOAN MODAL (Institutional Micro-Credit Application)
  */
 export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
   const { token, refreshWallet } = useAuth();
@@ -283,7 +258,7 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
 
   if (!isOpen || !product) return null;
 
-  // Real-time client-side preview calculation (reducing balance formula)
+  // Real-time reducing balance amortization preview
   const P = parseFloat(loanAmount) || 0;
   const R = product.interestRate;
   const n = product.loanTermMonths;
@@ -313,7 +288,7 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
 
-      // 2. Auto-Disburse for seamless end-to-end user experience in demo
+      // 2. Immediate Disbursement for interactive evaluation
       const disburseRes = await fetch(`/api/loans/${data.loan.loanId}/disburse`, {
         method: 'POST',
         headers: {
@@ -335,39 +310,38 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B192C]/60 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px] p-4">
+      <div className="bg-white rounded-[16px] max-w-lg w-full p-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-[#ebebeb]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2]">
           <div>
-            <h3 className="font-bold text-slate-900 text-base">Apply: {product.productName}</h3>
-            <p className="text-[11px] text-slate-500 font-mono-num">
-              Tenure: {product.loanTermMonths} Months • APR: {product.interestRate}%
+            <h3 className="font-semibold text-base text-[#171717] tracking-tight">{product.productName}</h3>
+            <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+              TENURE: {product.loanTermMonths}M // APR: {product.interestRate}%
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <span className="material-symbols-outlined text-xl">close</span>
+          <button onClick={onClose} className="text-[#8f8f8f] hover:text-[#171717] p-1">
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">error</span>
+          <div className="mt-3 p-2.5 rounded-[6px] bg-[#fff5f5] border border-[#ffcccc] text-[#ee0000] text-xs">
             {error}
           </div>
         )}
 
         <form onSubmit={handleApply} className="mt-4 space-y-4">
           <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                Requested Loan Amount
+            <div className="flex justify-between items-center mb-1">
+              <label className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f]">
+                Requested Principal
               </label>
-              <span className="text-[11px] text-slate-500 font-mono-num">
-                Limit: {formatINR(product.minLoanAmount)} - {formatINR(product.maxLoanAmount)}
+              <span className="font-geist-mono text-[11px] text-[#8f8f8f]">
+                {formatINR(product.minLoanAmount)} – {formatINR(product.maxLoanAmount)}
               </span>
             </div>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8f8f] text-sm">₹</span>
               <input
                 type="number"
                 step="500"
@@ -376,52 +350,45 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
                 value={loanAmount}
                 onChange={(e) => setLoanAmount(e.target.value)}
                 required
-                className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono-num text-sm text-slate-900 font-bold"
+                className="input-geist w-full pl-7 font-mono-num text-sm text-[#171717]"
               />
             </div>
           </div>
 
-          {/* Amortization Calculation Summary */}
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
-            <div className="flex justify-between text-xs text-slate-600">
-              <span>Estimated Monthly EMI:</span>
-              <span className="font-mono-num font-bold text-blue-600 text-sm">{formatINR(estEmi)}</span>
+          {/* Amortization Calculation Well (Geist Card) */}
+          <div className="p-3.5 bg-[#fafafa] border border-[#ebebeb] rounded-[10px] space-y-2 text-xs">
+            <div className="flex justify-between text-[#4d4d4d]">
+              <span>Monthly EMI:</span>
+              <span className="font-mono-num font-semibold text-[#171717]">{formatINR(estEmi)}</span>
             </div>
-            <div className="flex justify-between text-xs text-slate-600">
-              <span>Processing Fee (Deducted upfront):</span>
-              <span className="font-mono-num font-semibold text-slate-800">{formatINR(product.processingFee)}</span>
+            <div className="flex justify-between text-[#4d4d4d]">
+              <span>Upfront Processing Fee:</span>
+              <span className="font-mono-num text-[#171717]">{formatINR(product.processingFee)}</span>
             </div>
-            <div className="flex justify-between text-xs text-slate-600">
+            <div className="flex justify-between text-[#4d4d4d]">
               <span>Net Credited to Wallet:</span>
-              <span className="font-mono-num font-bold text-emerald-600">{formatINR(netDisbursement)}</span>
+              <span className="font-mono-num font-medium text-[#10b981]">{formatINR(netDisbursement)}</span>
             </div>
-            <div className="pt-2 border-t border-slate-200 flex justify-between text-xs font-semibold text-slate-900">
-              <span>Total Repayable over {n} Months:</span>
-              <span className="font-mono-num text-slate-900">{formatINR(totalPayable)}</span>
+            <div className="pt-2 border-t border-[#ebebeb] flex justify-between font-medium text-[#171717]">
+              <span>Total Payable ({n} Mos):</span>
+              <span className="font-mono-num">{formatINR(totalPayable)}</span>
             </div>
           </div>
 
-          <div className="pt-2 flex gap-3">
+          <div className="pt-2 flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 font-medium text-xs hover:bg-slate-50 transition-colors"
+              className="flex-1 py-2 px-3 rounded-[6px] border border-[#ebebeb] text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] text-xs font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              className="flex-1 py-2 px-3 rounded-[6px] bg-[#171717] hover:bg-[#333333] text-white text-xs font-medium transition-colors shadow-sm disabled:opacity-50"
             >
-              {loading ? (
-                <span>Processing Application...</span>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-sm">bolt</span>
-                  <span>Apply &amp; Disburse to Wallet</span>
-                </>
-              )}
+              {loading ? 'Processing Application...' : 'Apply & Disburse'}
             </button>
           </div>
         </form>
@@ -431,7 +398,7 @@ export function ApplyLoanModal({ isOpen, onClose, product, onSuccess }) {
 }
 
 /**
- * 4. REPAY EMI MODAL
+ * 4. REPAY EMI MODAL (Installment Settlement)
  */
 export function RepayEmiModal({ isOpen, onClose, emi, onSuccess }) {
   const { token, wallet, refreshWallet } = useAuth();
@@ -469,66 +436,64 @@ export function RepayEmiModal({ isOpen, onClose, emi, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B192C]/60 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px] p-4">
+      <div className="bg-white rounded-[16px] max-w-md w-full p-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-[#ebebeb]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2]">
           <div>
-            <h3 className="font-bold text-slate-900 text-base">
+            <h3 className="font-semibold text-base text-[#171717] tracking-tight">
               Pay Installment #{emi.installmentNumber || emi.emiNumber}
             </h3>
-            <p className="text-[11px] text-slate-500 font-mono-num">
-              Due Date: {emi.dueDate}
+            <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+              DUE DATE: {emi.dueDate}
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <span className="material-symbols-outlined text-xl">close</span>
+          <button onClick={onClose} className="text-[#8f8f8f] hover:text-[#171717] p-1">
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">error</span>
+          <div className="mt-3 p-2.5 rounded-[6px] bg-[#fff5f5] border border-[#ffcccc] text-[#ee0000] text-xs">
             {error}
           </div>
         )}
 
         <div className="mt-4 space-y-4">
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-            <div className="flex justify-between text-xs text-slate-600">
-              <span>Principal Component:</span>
-              <span className="font-mono-num font-semibold text-slate-800">{formatINR(emi.principalComponent)}</span>
+          <div className="p-3.5 bg-[#fafafa] border border-[#ebebeb] rounded-[10px] space-y-2 text-xs">
+            <div className="flex justify-between text-[#4d4d4d]">
+              <span>Principal Portion:</span>
+              <span className="font-mono-num font-medium text-[#171717]">{formatINR(emi.principalComponent)}</span>
             </div>
-            <div className="flex justify-between text-xs text-slate-600">
-              <span>Interest Component:</span>
-              <span className="font-mono-num font-semibold text-slate-800">{formatINR(emi.interestComponent)}</span>
+            <div className="flex justify-between text-[#4d4d4d]">
+              <span>Interest Portion:</span>
+              <span className="font-mono-num font-medium text-[#171717]">{formatINR(emi.interestComponent)}</span>
             </div>
-            <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-bold text-slate-900">
-              <span>Total EMI Amount:</span>
-              <span className="font-mono-num text-blue-600">{formatINR(emiAmount)}</span>
+            <div className="pt-2 border-t border-[#ebebeb] flex justify-between font-semibold text-sm text-[#171717]">
+              <span>Installment Amount:</span>
+              <span className="font-mono-num">{formatINR(emiAmount)}</span>
             </div>
           </div>
 
-          {/* Balance Check */}
-          <div className={`p-3 rounded-lg border text-xs flex items-center justify-between ${
+          <div className={`p-2.5 rounded-[6px] border text-xs flex items-center justify-between ${
             hasSufficientBalance 
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-              : 'bg-rose-50 border-rose-200 text-rose-800'
+              ? 'bg-[#f7faf7] border-[#d1ebd1] text-[#171717]' 
+              : 'bg-[#fff5f5] border-[#ffcccc] text-[#ee0000]'
           }`}>
-            <span className="font-medium">Wallet Balance:</span>
-            <span className="font-mono-num font-bold">{formatINR(currentBalance)}</span>
+            <span className="text-[#4d4d4d]">Available Wallet Balance:</span>
+            <span className="font-mono-num font-medium">{formatINR(currentBalance)}</span>
           </div>
 
           {!hasSufficientBalance && (
-            <p className="text-[11px] text-rose-600">
-              Insufficient funds. Please credit your wallet first.
+            <p className="text-[11px] text-[#ee0000]">
+              Insufficient funds. Please deposit funds into your wallet to settle this installment.
             </p>
           )}
 
-          <div className="pt-2 flex gap-3">
+          <div className="pt-2 flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 font-medium text-xs hover:bg-slate-50 transition-colors"
+              className="flex-1 py-2 px-3 rounded-[6px] border border-[#ebebeb] text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] text-xs font-medium transition-colors"
             >
               Cancel
             </button>
@@ -536,16 +501,9 @@ export function RepayEmiModal({ isOpen, onClose, emi, onSuccess }) {
               type="button"
               disabled={loading || !hasSufficientBalance}
               onClick={handlePay}
-              className="flex-1 py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              className="flex-1 py-2 px-3 rounded-[6px] bg-[#171717] hover:bg-[#333333] text-white text-xs font-medium transition-colors shadow-sm disabled:opacity-50"
             >
-              {loading ? (
-                <span>Processing Payment...</span>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-sm">lock_clock</span>
-                  <span>Confirm Payment</span>
-                </>
-              )}
+              {loading ? 'Processing Payment...' : 'Confirm Payment'}
             </button>
           </div>
         </div>

@@ -18,17 +18,17 @@ function MainApp() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="font-mono-num text-xs font-semibold text-slate-600">Connecting to MicroLend Secure Portal...</p>
+          <div className="w-8 h-8 border-2 border-[#171717] border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-geist-mono text-xs uppercase tracking-wider text-[#8f8f8f]">INITIALIZING MICROLEND // POSTGRESQL</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#fafafa] text-[#171717]">
       {/* Fixed Header */}
       <Header
         onOpenAuthModal={() => setShowAuthModal(true)}

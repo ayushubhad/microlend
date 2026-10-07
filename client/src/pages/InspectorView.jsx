@@ -71,70 +71,66 @@ export default function InspectorView() {
     <div className="flex flex-col gap-6">
       
       {/* Top Banner */}
-      <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-600 text-xs font-semibold uppercase tracking-wider mb-1">
-            <span className="material-symbols-outlined text-base">account_tree</span>
-            <span>Relational Architecture Console</span>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900">PostgreSQL Schema &amp; Integrity Console</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Interactive inspection of 3NF relational schemas, column constraints, primary/foreign keys, and real-time transaction concurrency tests.
+          <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
+            Database Architecture Console
+          </span>
+          <h2 className="text-xl font-semibold text-[#171717] tracking-tight">PostgreSQL Schema &amp; Integrity Console</h2>
+          <p className="text-xs text-[#4d4d4d] mt-1">
+            Real-time inspection of 3NF relational tables, column data types, foreign key graphs, and transaction locking.
           </p>
         </div>
 
         <button
           onClick={loadInspectorData}
-          className="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200 self-start md:self-auto"
+          className="btn-app-ghost self-start md:self-auto text-xs"
         >
-          <span className="material-symbols-outlined text-base">refresh</span>
+          <span className="material-symbols-outlined text-xs">refresh</span>
           <span>Refresh Metadata</span>
         </button>
       </section>
 
-      {/* 1. INTERACTIVE CONCURRENCY & TRIGGER EXPERIMENTS ROW */}
+      {/* 1. INTERACTIVE CONCURRENCY & TRIGGER DEFENSE TESTS */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Experiment A: Concurrency & Double-Spending Simulation */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col justify-between">
+        {/* Test A: Concurrency & Double-Spending Simulation */}
+        <div className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-blue-600">sync_problem</span>
-                <h3 className="font-bold text-slate-900 text-sm">Concurrency &amp; Race Condition Test</h3>
-              </div>
-              <span className="text-[10px] font-mono-num font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+            <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
+              <h3 className="font-semibold text-sm text-[#171717]">Concurrency &amp; Race Condition Test</h3>
+              <span className="font-geist-mono text-[10px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#171717]">
                 SELECT ... FOR UPDATE
               </span>
             </div>
 
-            <p className="text-xs text-slate-600 mb-4">
-              Launches <strong>Thread A</strong> and <strong>Thread B</strong> simultaneously in parallel via <code>Promise.all</code>, both attempting to withdraw <strong>₹ 400.00</strong> from a test wallet funded with only <strong>₹ 500.00</strong>.
+            <p className="text-xs text-[#4d4d4d] mb-4">
+              Dispatches <strong>Thread A</strong> and <strong>Thread B</strong> simultaneously in parallel via <code>Promise.all</code>, both requesting to withdraw <strong>₹ 400.00</strong> from a wallet holding only <strong>₹ 500.00</strong>.
             </p>
 
             {simResult && (
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 font-mono-num text-xs mb-4">
-                <div className="flex justify-between font-bold">
+              <div className="p-3.5 bg-[#fafafa] border border-[#ebebeb] rounded-[8px] space-y-2.5 font-geist-mono text-xs mb-4">
+                <div className="flex justify-between font-medium">
                   <span>Initial Balance: {formatINR(simResult.initialBalance)}</span>
-                  <span className={simResult.doubleSpendingPrevented ? 'text-emerald-600' : 'text-rose-600'}>
+                  <span className={simResult.doubleSpendingPrevented ? 'text-[#10b981]' : 'text-[#ee0000]'}>
                     Final: {formatINR(simResult.finalBalance)}
                   </span>
                 </div>
 
-                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-[11px] font-sans font-medium">
+                <div className="p-2 bg-[#f7faf7] border border-[#d1ebd1] rounded-[6px] text-[#171717] text-[11px] font-sans">
                   {simResult.conclusion}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[10px]">
-                  <div className="p-2 bg-white rounded border border-slate-200">
-                    <span className="font-bold text-slate-800 block mb-1">Thread A (100ms lock hold)</span>
-                    <span className="text-emerald-600 font-bold">{simResult.threadA.status}</span>
-                    <p className="text-slate-500 mt-0.5">{simResult.threadA.durationMs}ms duration</p>
+                  <div className="p-2 bg-white rounded-[6px] border border-[#ebebeb]">
+                    <span className="text-[#8f8f8f] block mb-0.5">Thread A (Lock Holder)</span>
+                    <span className="text-[#10b981] font-semibold">{simResult.threadA.status}</span>
+                    <p className="text-[#8f8f8f] mt-0.5">{simResult.threadA.durationMs}ms duration</p>
                   </div>
-                  <div className="p-2 bg-white rounded border border-slate-200">
-                    <span className="font-bold text-slate-800 block mb-1">Thread B (Concurrent)</span>
-                    <span className="text-rose-600 font-bold">{simResult.threadB.status}</span>
-                    <p className="text-slate-500 mt-0.5">Blocked by row lock &amp; rejected</p>
+                  <div className="p-2 bg-white rounded-[6px] border border-[#ebebeb]">
+                    <span className="text-[#8f8f8f] block mb-0.5">Thread B (Concurrent)</span>
+                    <span className="text-[#ee0000] font-semibold">{simResult.threadB.status}</span>
+                    <p className="text-[#8f8f8f] mt-0.5">Blocked by row lock &amp; rejected</p>
                   </div>
                 </div>
               </div>
@@ -144,53 +140,39 @@ export default function InspectorView() {
           <button
             onClick={handleSimulateConcurrency}
             disabled={simulating}
-            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+            className="btn-marketing-primary w-full text-xs py-2.5"
           >
-            {simulating ? (
-              <span>Executing Concurrent Parallel Threads...</span>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-sm">play_circle</span>
-                <span>Launch Live Concurrency Simulation</span>
-              </>
-            )}
+            <span>{simulating ? 'Executing Concurrent Threads...' : 'Run Concurrency Stress-Test'}</span>
           </button>
         </div>
 
-        {/* Experiment B: Trigger Protection (Immutability Defense) */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col justify-between">
+        {/* Test B: Trigger Ledger Protection Test */}
+        <div className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-emerald-600">security</span>
-                <h3 className="font-bold text-slate-900 text-sm">Trigger Ledger Protection Test</h3>
-              </div>
-              <span className="text-[10px] font-mono-num font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                trg_protect_transaction_ledger
+            <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
+              <h3 className="font-semibold text-sm text-[#171717]">Immutable Ledger Trigger Validator</h3>
+              <span className="font-geist-mono text-[10px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#171717]">
+                BEFORE UPDATE / DELETE
               </span>
             </div>
 
-            <p className="text-xs text-slate-600 mb-4">
-              Directly executes an unauthorized <code>UPDATE transaction_ledger SET amount = 0.00</code> to prove that the database engine itself rejects any tampering attempt.
+            <p className="text-xs text-[#4d4d4d] mb-4">
+              Attempts an illegal direct SQL mutation (<code>UPDATE transaction_ledger SET amount = 999999</code>) to test whether database trigger <code>trg_protect_transaction_ledger</code> halts execution.
             </p>
 
             {triggerResult && (
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5 font-mono-num text-xs mb-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500">Trigger Enforced:</span>
-                  <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    PASSED (RAISED EXCEPTION)
+              <div className="p-3.5 bg-[#fafafa] border border-[#ebebeb] rounded-[8px] space-y-2 font-geist-mono text-xs mb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#8f8f8f]">Trigger Enforced:</span>
+                  <span className="text-[#10b981] font-semibold">
+                    {triggerResult.triggerEnforced ? 'YES (100% PROTECTED)' : 'NO'}
                   </span>
                 </div>
 
-                <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-[11px] font-mono-num">
-                  <span className="font-bold block mb-0.5">PostgreSQL Exception:</span>
-                  {triggerResult.databaseResponse}
+                <div className="p-2.5 bg-[#fffbf2] border border-[#ffeed0] rounded-[6px] text-[#ab570a] text-[11px] font-sans">
+                  <span className="font-semibold block mb-0.5">PostgreSQL Engine Error Raised:</span>
+                  <span className="font-geist-mono text-[10px] text-[#171717]">{triggerResult.databaseResponse}</span>
                 </div>
-
-                <p className="text-[11px] text-slate-500 font-sans">
-                  {triggerResult.explanation}
-                </p>
               </div>
             )}
           </div>
@@ -198,106 +180,35 @@ export default function InspectorView() {
           <button
             onClick={handleTestTrigger}
             disabled={testingTrigger}
-            className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+            className="btn-marketing-secondary w-full text-xs py-2.5"
           >
-            {testingTrigger ? (
-              <span>Executing Query Against Trigger...</span>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-sm">shield</span>
-                <span>Test Trigger Tampering Prevention</span>
-              </>
-            )}
+            <span>{testingTrigger ? 'Testing Trigger Execution...' : 'Test Tamper-Proof Trigger'}</span>
           </button>
         </div>
 
       </section>
 
-      {/* 2. COMPLEX AGGREGATIONS & GROUP BY METRICS */}
-      {metrics && (
-        <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-          <h3 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-indigo-600">bar_chart</span>
-            <span>DBMS Aggregate Analysis (GROUP BY, SUM, AVG, COUNT)</span>
-          </h3>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">Total Capital Disbursed</span>
-              <span className="font-mono-num font-bold text-slate-900 text-lg">{formatINR(metrics.portfolio.totalDisbursed)}</span>
-              <p className="text-[10px] text-slate-400 font-mono-num mt-0.5">across {metrics.portfolio.totalLoans} loan contracts</p>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">Active Outstanding</span>
-              <span className="font-mono-num font-bold text-indigo-600 text-lg">{formatINR(metrics.portfolio.outstandingBalance)}</span>
-              <p className="text-[10px] text-slate-400 font-mono-num mt-0.5">in servicing portfolio</p>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">Principal Recovery Ratio</span>
-              <span className="font-mono-num font-bold text-emerald-600 text-lg">{metrics.portfolio.recoveryRatePercent}%</span>
-              <p className="text-[10px] text-slate-400 font-mono-num mt-0.5">{formatINR(metrics.portfolio.principalSettled)} collected</p>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">Vault Liquidity</span>
-              <span className="font-mono-num font-bold text-slate-900 text-lg">{formatINR(metrics.vault.totalLiquidity)}</span>
-              <p className="text-[10px] text-slate-400 font-mono-num mt-0.5">across {metrics.vault.totalWallets} active wallets</p>
-            </div>
-          </div>
-
-          {/* Group By: Transaction Breakdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">
-                Volume Breakdown by Transaction Type
-              </h4>
-              <div className="space-y-2 text-xs font-mono-num">
-                {metrics.transactionVolumeByType.map((t) => (
-                  <div key={t.type} className="flex justify-between items-center py-1 border-b border-slate-100">
-                    <span className="font-medium text-slate-600">{t.type} ({t.count}x)</span>
-                    <span className="font-bold text-slate-900">{formatINR(t.totalVolume)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">
-                Portfolio Distribution by Loan Product
-              </h4>
-              <div className="space-y-2 text-xs font-mono-num">
-                {metrics.productExposure.map((p) => (
-                  <div key={p.productName} className="flex justify-between items-center py-1 border-b border-slate-100">
-                    <span className="font-medium text-slate-600">{p.productName} ({p.loansCount} loans)</span>
-                    <span className="font-bold text-slate-900">{formatINR(p.totalBorrowed)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 3. LIVE RELATIONAL SCHEMA INSPECTOR */}
+      {/* 2. LIVE RELATIONAL SCHEMA INSPECTOR (3NF) */}
       {schema && (
-        <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-4 gap-3">
+        <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4 gap-3">
             <div>
-              <h3 className="font-bold text-slate-900 text-base">Relational Schema Inspector (3NF)</h3>
-              <p className="text-xs text-slate-500 font-mono-num">
-                Inspect physical tables, primary keys, and foreign keys in the active PostgreSQL database.
+              <h3 className="font-semibold text-sm text-[#171717]">Relational Schema Inspector (3NF)</h3>
+              <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+                INSPECT PHYSICAL TABLES, CONSTRAINTS &amp; FOREIGN KEY RELATIONS
               </p>
             </div>
 
-            {/* Table Selector */}
-            <div className="flex items-center gap-1.5 flex-wrap">
+            {/* Table Selection Pills */}
+            <div className="flex items-center gap-1 flex-wrap">
               {Object.keys(schema).map((tableName) => (
                 <button
                   key={tableName}
                   onClick={() => setSelectedTable(tableName)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono-num font-semibold transition-colors ${
+                  className={`px-2.5 py-1 rounded-[6px] text-xs font-geist-mono transition-colors border ${
                     selectedTable === tableName
-                      ? 'bg-blue-600 text-white shadow-2xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-[#171717] text-white border-[#171717]'
+                      : 'bg-white text-[#4d4d4d] border-[#ebebeb] hover:border-[#a1a1a1]'
                   }`}
                 >
                   {tableName} ({schema[tableName].rowCount})
@@ -309,28 +220,28 @@ export default function InspectorView() {
           {/* Active Table Details */}
           {schema[selectedTable] && (
             <div>
-              <div className="flex items-center justify-between text-xs font-mono-num mb-3">
-                <span className="font-bold text-slate-800">TABLE: {selectedTable}</span>
-                <span className="text-slate-500">Total Rows: {schema[selectedTable].rowCount}</span>
+              <div className="flex items-center justify-between text-xs font-geist-mono mb-2.5 text-[#8f8f8f]">
+                <span>RELATION: {selectedTable.toUpperCase()}</span>
+                <span>TOTAL ROWS: {schema[selectedTable].rowCount}</span>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-200">
-                      <th className="py-2 px-3">Column Name</th>
-                      <th className="py-2 px-3">Data Type</th>
-                      <th className="py-2 px-3">Nullable</th>
-                      <th className="py-2 px-3">Default Value</th>
+                    <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
+                      <th className="py-2 px-3 font-medium">Column Name</th>
+                      <th className="py-2 px-3 font-medium">Data Type</th>
+                      <th className="py-2 px-3 font-medium">Nullable</th>
+                      <th className="py-2 px-3 font-medium">Default</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono-num">
+                  <tbody className="divide-y divide-[#f2f2f2] font-mono-num">
                     {schema[selectedTable].columns.map((c) => (
-                      <tr key={c.name} className="hover:bg-slate-50/70">
-                        <td className="py-2 px-3 font-semibold text-slate-900">{c.name}</td>
-                        <td className="py-2 px-3 text-blue-600 font-bold">{c.type}</td>
-                        <td className="py-2 px-3 text-slate-500">{c.nullable ? 'YES' : 'NO'}</td>
-                        <td className="py-2 px-3 text-slate-400 text-[11px]">{c.default || 'None'}</td>
+                      <tr key={c.name} className="hover:bg-[#fafafa]">
+                        <td className="py-2 px-3 font-medium text-[#171717]">{c.name}</td>
+                        <td className="py-2 px-3 font-geist-mono text-[#0070f3]">{c.type}</td>
+                        <td className="py-2 px-3 text-[#4d4d4d]">{c.nullable ? 'YES' : 'NO'}</td>
+                        <td className="py-2 px-3 text-[#8f8f8f] font-geist-mono text-[11px]">{c.default || 'None'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -338,13 +249,13 @@ export default function InspectorView() {
               </div>
 
               {schema[selectedTable].foreignKeys.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-slate-100">
-                  <span className="text-[11px] font-semibold uppercase text-slate-400 block mb-1">
+                <div className="mt-4 pt-3 border-t border-[#f2f2f2]">
+                  <span className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1.5">
                     Foreign Key Relational Links:
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {schema[selectedTable].foreignKeys.map((fk, idx) => (
-                      <span key={idx} className="font-mono-num text-[11px] px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      <span key={idx} className="font-geist-mono text-[11px] px-2 py-0.5 rounded-[4px] bg-[#fafafa] text-[#171717] border border-[#ebebeb]">
                         {fk.column_name} ➔ {fk.foreign_table_name}({fk.foreign_column_name})
                       </span>
                     ))}

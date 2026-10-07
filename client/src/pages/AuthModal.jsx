@@ -45,142 +45,144 @@ export default function AuthModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B192C]/60 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px] p-4">
+      <div className="bg-white rounded-[16px] max-w-md w-full p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-[#ebebeb]">
         
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2]">
           <div>
-            <h3 className="text-xl font-bold text-slate-900">
-              {isRegister ? 'Borrower Registration' : 'Account Login'}
+            <h3 className="text-base font-semibold text-[#171717] tracking-tight">
+              {isRegister ? 'Borrower Registration' : 'Account Sign In'}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {isRegister ? 'Atomic onboarding with digital wallet provisioning' : 'Access your PostgreSQL-backed micro-lending portal'}
+            <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+              {isRegister ? 'ATOMIC USER & WALLET CREATION' : 'AUTHENTICATE VIA BCRYPT & JWT'}
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <span className="material-symbols-outlined text-xl">close</span>
+          <button onClick={onClose} className="text-[#8f8f8f] hover:text-[#171717] p-1">
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+          <div className="mt-3 p-2.5 rounded-[6px] bg-[#fff5f5] border border-[#ffcccc] text-[#ee0000] text-xs">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3.5">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           {isRegister && (
             <>
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Full Legal Name</label>
+                <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Legal Full Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Ramesh Patel"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300"
+                  className="input-geist w-full text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Phone Number</label>
+                  <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Phone Number</label>
                   <input
                     type="tel"
                     required
                     placeholder="+919800000000"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                    className="input-geist w-full text-xs font-mono-num"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">12-Digit Aadhaar</label>
+                  <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">12-Digit Aadhaar</label>
                   <input
                     type="text"
                     required
-                    maxLength={12}
+                    maxLength="12"
                     placeholder="123456789012"
                     value={aadhaar}
                     onChange={(e) => setAadhaar(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                    className="input-geist w-full text-xs font-mono-num"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Physical Address</label>
+                <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Residential Address</label>
                 <input
                   type="text"
                   required
-                  placeholder="Street, City, Pincode"
+                  placeholder="Flat 101, Mumbai, Maharashtra"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300"
+                  className="input-geist w-full text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Initial Wallet Deposit (INR)</label>
+                <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Initial Wallet Credit (INR)</label>
                 <input
                   type="number"
+                  required
                   min="0"
-                  step="500"
+                  step="100"
                   value={initialDeposit}
                   onChange={(e) => setInitialDeposit(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                  className="input-geist w-full text-xs font-mono-num"
                 />
               </div>
             </>
           )}
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Email Address</label>
+            <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Email Address</label>
             <input
               type="email"
               required
-              placeholder="e.g. borrower@example.com"
+              placeholder="borrower@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300"
+              className="input-geist w-full text-xs font-mono-num"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Password</label>
+            <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Password</label>
             <input
               type="password"
               required
-              placeholder="••••••••"
+              placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300"
+              className="input-geist w-full text-xs"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 mt-2"
-          >
-            {loading ? (
-              <span>Authenticating...</span>
-            ) : (
-              <span>{isRegister ? 'Complete Registration' : 'Log In to MicroLend'}</span>
-            )}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-marketing-primary w-full text-xs py-2.5"
+            >
+              {loading ? 'Authenticating...' : isRegister ? 'Register & Provision Wallet' : 'Sign In'}
+            </button>
+          </div>
         </form>
 
-        <div className="mt-4 pt-3 border-t border-slate-100 text-center">
+        <div className="mt-4 pt-3 border-t border-[#f2f2f2] text-center">
           <button
+            type="button"
             onClick={() => {
               setIsRegister(!isRegister);
               setError(null);
             }}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+            className="text-xs text-[#0070f3] hover:underline font-normal"
           >
-            {isRegister ? 'Already have an account? Sign In' : "Don't have an account? Register Here"}
+            {isRegister
+              ? 'Already registered? Sign in to your account'
+              : "Don't have an account? Register as a borrower"}
           </button>
         </div>
 

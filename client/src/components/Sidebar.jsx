@@ -5,55 +5,54 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   const { user } = useAuth();
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', badge: null },
-    { id: 'wallet', label: 'My Wallet', icon: 'account_balance_wallet', badge: null },
-    { id: 'products', label: 'Loan Products', icon: 'credit_score', badge: null },
-    { id: 'loans', label: 'My Loans & EMIs', icon: 'calendar_month', badge: null },
-    { id: 'ledger', label: 'Transaction Ledger', icon: 'receipt_long', badge: 'Verified' },
-    { id: 'inspector', label: 'DBMS Schema', icon: 'account_tree', badge: 'Inspector' },
-    { id: 'landing', label: 'System Overview', icon: 'info', badge: null },
+    { id: 'dashboard', label: 'Dashboard', icon: 'space_dashboard' },
+    { id: 'loans', label: 'Loans & EMIs', icon: 'credit_card' },
+    { id: 'products', label: 'Loan Products', icon: 'account_tree' },
+    { id: 'wallet', label: 'My Wallet', icon: 'account_balance_wallet' },
+    { id: 'ledger', label: 'Transaction Ledger', icon: 'receipt_long' },
+    { id: 'inspector', label: 'DBMS Schema', icon: 'data_object' },
+    { id: 'landing', label: 'Overview Docs', icon: 'menu_book' },
   ];
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-slate-200 z-40 flex flex-col justify-between py-6">
+    <aside className="fixed left-0 top-14 bottom-0 w-64 bg-[#fafafa] border-r border-[#ebebeb] z-40 flex flex-col justify-between py-5">
       
       {/* Top Nav Section */}
-      <div className="px-4 flex flex-col gap-2">
-        <div className="px-3 py-1">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono-num">
-            Financial Services
+      <div className="px-3 flex flex-col gap-4">
+        <div>
+          <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider px-3">
+            Core Modules
           </span>
         </div>
 
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-0.5">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-[6px] text-xs transition-colors ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-sm font-semibold'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-[#f2f2f2] text-[#171717] font-medium'
+                    : 'text-[#4d4d4d] hover:bg-[#f7f7f7] hover:text-[#171717]'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className={`material-symbols-outlined text-lg ${isActive ? 'text-white' : 'text-slate-500'}`}>
+                <div className="flex items-center gap-2.5">
+                  <span className={`material-symbols-outlined text-[18px] ${isActive ? 'text-[#171717]' : 'text-[#8f8f8f]'}`}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
                 </div>
 
-                {item.badge && (
-                  <span
-                    className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded font-mono-num ${
-                      isActive
-                        ? 'bg-blue-700 text-blue-100'
-                        : 'bg-slate-100 text-slate-500 border border-slate-200'
-                    }`}
-                  >
-                    {item.badge}
+                {item.id === 'inspector' && (
+                  <span className="font-geist-mono text-[9px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-white text-[#8f8f8f]">
+                    3NF
+                  </span>
+                )}
+                {item.id === 'ledger' && (
+                  <span className="font-geist-mono text-[9px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-white text-[#8f8f8f]">
+                    Audit
                   </span>
                 )}
               </button>
@@ -62,19 +61,25 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         </nav>
       </div>
 
-      {/* Bottom Security / Trust Badge */}
-      <div className="px-4">
-        <div className="p-3.5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl shadow-sm flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-emerald-400 text-lg">verified_user</span>
-            <span className="text-xs font-semibold tracking-tight">Enterprise Security</span>
+      {/* Bottom Technical Spec Well (Geist Card) */}
+      <div className="px-3">
+        <div className="p-3 bg-white border border-[#ebebeb] rounded-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="font-geist-mono text-[10px] text-[#8f8f8f] uppercase">Engine</span>
+            <span className="font-geist-mono text-[10px] text-[#171717] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+              PostgreSQL 18.4
+            </span>
           </div>
-          <p className="text-[11px] text-slate-300 leading-relaxed">
-            End-to-end encrypted financial ledger with automated reconciliation.
-          </p>
-          <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between text-[10px] text-slate-400">
-            <span>Core Version</span>
-            <span className="font-semibold text-emerald-400">v2.4 Production</span>
+
+          <div className="flex items-center justify-between">
+            <span className="font-geist-mono text-[10px] text-[#8f8f8f] uppercase">Isolation</span>
+            <span className="font-geist-mono text-[10px] text-[#171717]">READ_COMMITTED</span>
+          </div>
+
+          <div className="pt-2 border-t border-[#f2f2f2] flex items-center justify-between text-[11px] text-[#8f8f8f]">
+            <span className="font-geist-mono text-[10px]">Pessimistic Locks</span>
+            <span className="font-geist-mono text-[10px] text-[#171717] font-medium">ROW_LOCK</span>
           </div>
         </div>
       </div>

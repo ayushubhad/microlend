@@ -60,48 +60,45 @@ export default function LoansView({ setActiveTab }) {
     <div className="flex flex-col gap-6">
       
       {/* Top Banner */}
-      <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-600 text-xs font-semibold uppercase tracking-wider mb-1">
-            <span className="material-symbols-outlined text-base">calendar_month</span>
-            <span>Loan Portfolio &amp; EMI Amortization</span>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900">My Loan Accounts</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Every installment is split into Principal and Interest components via strict Reducing Balance Amortization.
+          <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
+            Amortization Schedules
+          </span>
+          <h2 className="text-xl font-semibold text-[#171717] tracking-tight">Active Loan Accounts &amp; EMIs</h2>
+          <p className="text-xs text-[#4d4d4d] mt-1">
+            Every installment is split into principal and interest via strict reducing-balance mathematical formula.
           </p>
         </div>
 
         <button
           onClick={() => setActiveTab('products')}
-          className="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs self-start md:self-auto"
+          className="btn-app-primary self-start md:self-auto"
         >
-          <span className="material-symbols-outlined text-base">add</span>
-          <span>Apply For Another Loan</span>
+          <span className="material-symbols-outlined text-sm">add</span>
+          <span>Apply For Loan</span>
         </button>
       </section>
 
-      {/* Loan Selection Tabs */}
+      {/* Loan Selection Cards or Empty State */}
       {loans.length === 0 ? (
-        <section className="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-xs">
-          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
-            <span className="material-symbols-outlined text-2xl">credit_card_off</span>
-          </div>
-          <h3 className="font-bold text-slate-800 text-base">No active loans found</h3>
-          <p className="text-xs text-slate-500 mt-1 mb-4 max-w-sm mx-auto">
-            You do not currently have any active or past loans. Browse our loan catalog to get started.
+        <section className="bg-white rounded-[12px] p-12 text-center border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <span className="material-symbols-outlined text-3xl text-[#8f8f8f] mb-2 block">credit_card_off</span>
+          <h3 className="font-semibold text-sm text-[#171717]">No active loans found</h3>
+          <p className="text-xs text-[#8f8f8f] mt-1 mb-4 max-w-sm mx-auto font-geist-mono">
+            ZERO CONTRACTS ACTIVE IN POSTGRESQL DATABASE
           </p>
           <button
             onClick={() => setActiveTab('products')}
-            className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs"
+            className="btn-app-primary"
           >
-            Browse Loan Catalog
+            Browse Products
           </button>
         </section>
       ) : (
         <div className="flex flex-col gap-6">
           
-          {/* Loan Account Cards */}
+          {/* Loan Account Cards (Geist Tiles) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loans.map((l) => {
               const isSelected = selectedLoanId === l.loanId;
@@ -109,35 +106,29 @@ export default function LoansView({ setActiveTab }) {
                 <div
                   key={l.loanId}
                   onClick={() => setSelectedLoanId(l.loanId)}
-                  className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+                  className={`p-5 rounded-[12px] border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-blue-50/50 border-blue-600 shadow-sm ring-1 ring-blue-600'
-                      : 'bg-white border-slate-200 hover:border-slate-300'
+                      ? 'bg-white border-[#171717] shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-[#171717]'
+                      : 'bg-white border-[#ebebeb] hover:border-[#a1a1a1]'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-sm text-slate-900">{l.productName}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      l.loanStatus === 'ACTIVE'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : l.loanStatus === 'CLOSED'
-                        ? 'bg-slate-100 text-slate-600'
-                        : 'bg-amber-50 text-amber-700 border border-amber-200'
-                    }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-sm text-[#171717]">{l.productName}</span>
+                    <span className="font-geist-mono text-[10px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#171717]">
                       {l.loanStatus}
                     </span>
                   </div>
 
-                  <div className="font-mono-num text-xl font-bold text-slate-900 mb-1">
+                  <div className="font-mono-num text-xl font-semibold text-[#171717] mb-1">
                     {formatINR(l.outstandingBalance)}
                   </div>
-                  <p className="text-[11px] text-slate-500 font-mono-num mb-3">
+                  <p className="text-xs text-[#8f8f8f] font-mono-num mb-3">
                     Outstanding of {formatINR(l.loanAmount)}
                   </p>
 
-                  <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs font-mono-num">
-                    <span className="text-slate-500">EMI: {formatINR(l.emiAmount)}</span>
-                    <span className="font-semibold text-blue-600">{l.paidEmis}/{l.totalEmis} Paid</span>
+                  <div className="pt-2.5 border-t border-[#f2f2f2] flex items-center justify-between text-xs font-geist-mono text-[#8f8f8f]">
+                    <span>EMI: {formatINR(l.emiAmount)}</span>
+                    <span className="text-[#171717] font-medium">{l.paidEmis}/{l.totalEmis} Paid</span>
                   </div>
                 </div>
               );
@@ -146,71 +137,70 @@ export default function LoansView({ setActiveTab }) {
 
           {/* Detailed Amortization Table */}
           {loanDetails && (
-            <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-4 gap-2">
+            <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4 gap-2">
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">
+                  <h3 className="font-semibold text-sm text-[#171717]">
                     Amortization Schedule: {loanDetails.productName}
                   </h3>
-                  <p className="text-xs text-slate-500 font-mono-num">
-                    Loan ID: #{loanDetails.loanId.slice(0, 8)} • APR: {loanDetails.interestRate}% • Total Payable: {formatINR(loanDetails.totalPayable)}
+                  <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+                    ID: #{loanDetails.loanId.slice(0, 8)} // APR: {loanDetails.interestRate}% // TOTAL: {formatINR(loanDetails.totalPayable)}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 font-medium">Monthly Installment:</span>
-                  <span className="font-mono-num font-bold text-blue-600 text-sm">{formatINR(loanDetails.emiAmount)}</span>
+                  <span className="font-geist-mono text-xs text-[#8f8f8f]">Monthly Installment:</span>
+                  <span className="font-mono-num font-semibold text-[#171717] text-sm">{formatINR(loanDetails.emiAmount)}</span>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-200">
-                      <th className="py-2.5 px-3"># No</th>
-                      <th className="py-2.5 px-3">Due Date</th>
-                      <th className="py-2.5 px-3">EMI Amount</th>
-                      <th className="py-2.5 px-3">Principal Split</th>
-                      <th className="py-2.5 px-3">Interest Split</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3">Payment Timestamp</th>
-                      <th className="py-2.5 px-3 text-right">Action</th>
+                    <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
+                      <th className="py-2.5 px-3 font-medium">#</th>
+                      <th className="py-2.5 px-3 font-medium">Due Date</th>
+                      <th className="py-2.5 px-3 font-medium">Total EMI</th>
+                      <th className="py-2.5 px-3 font-medium">Principal Portion</th>
+                      <th className="py-2.5 px-3 font-medium">Interest Portion</th>
+                      <th className="py-2.5 px-3 font-medium">Status</th>
+                      <th className="py-2.5 px-3 font-medium">Paid Date</th>
+                      <th className="py-2.5 px-3 text-right font-medium">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono-num">
+                  <tbody className="divide-y divide-[#f2f2f2] font-mono-num">
                     {loanDetails.schedule?.map((emi) => (
-                      <tr key={emi.emiId} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-3 font-bold text-slate-700">
+                      <tr key={emi.emiId} className="hover:bg-[#fafafa] transition-colors">
+                        <td className="py-2.5 px-3 font-medium text-[#171717]">
                           #{String(emi.emiNumber).padStart(2, '0')}
                         </td>
-                        <td className="py-3 px-3 font-semibold text-slate-900">{emi.dueDate}</td>
-                        <td className="py-3 px-3 font-bold text-blue-600">{formatINR(emi.emiAmount)}</td>
-                        <td className="py-3 px-3 text-emerald-700 font-medium">{formatINR(emi.principalComponent)}</td>
-                        <td className="py-3 px-3 text-amber-700 font-medium">{formatINR(emi.interestComponent)}</td>
-                        <td className="py-3 px-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        <td className="py-2.5 px-3 text-[#171717]">{emi.dueDate}</td>
+                        <td className="py-2.5 px-3 font-semibold text-[#171717]">{formatINR(emi.emiAmount)}</td>
+                        <td className="py-2.5 px-3 text-[#4d4d4d]">{formatINR(emi.principalComponent)}</td>
+                        <td className="py-2.5 px-3 text-[#8f8f8f]">{formatINR(emi.interestComponent)}</td>
+                        <td className="py-2.5 px-3">
+                          <span className={`font-geist-mono text-[10px] px-1.5 py-0.5 rounded-[4px] border ${
                             emi.paymentStatus === 'PAID'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              ? 'border-[#d1ebd1] bg-[#f7faf7] text-[#10b981]'
+                              : 'border-[#ffeed0] bg-[#fffbf2] text-[#f5a623]'
                           }`}>
                             {emi.paymentStatus}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-slate-500 text-[11px]">
-                          {emi.paidDate ? new Date(emi.paidDate).toLocaleString() : '—'}
+                        <td className="py-2.5 px-3 text-[#8f8f8f] text-[11px]">
+                          {emi.paidDate ? new Date(emi.paidDate).toLocaleDateString() : '—'}
                         </td>
-                        <td className="py-3 px-3 text-right">
+                        <td className="py-2.5 px-3 text-right">
                           {emi.paymentStatus === 'PAID' ? (
-                            <span className="text-[11px] font-semibold text-emerald-600 flex items-center justify-end gap-1">
-                              <span className="material-symbols-outlined text-sm">check_circle</span>
-                              Paid
+                            <span className="font-geist-mono text-[11px] text-[#10b981] inline-flex items-center gap-1">
+                              Settled
                             </span>
                           ) : (
                             <button
                               onClick={() => setSelectedEmiForPay(emi)}
-                              className="py-1 px-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[11px] rounded-lg transition-colors shadow-2xs"
+                              className="btn-app-primary text-xs py-1 px-2.5"
                             >
-                              Pay EMI
+                              Pay Now
                             </button>
                           )}
                         </td>

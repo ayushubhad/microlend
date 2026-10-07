@@ -71,164 +71,162 @@ export default function ProductsView({ setActiveTab }) {
     <div className="flex flex-col gap-6">
       
       {/* Header Banner */}
-      <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-600 text-xs font-semibold uppercase tracking-wider mb-1">
-            <span className="material-symbols-outlined text-base">credit_score</span>
-            <span>Institutional Loan Catalog</span>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900">Configured Loan Products</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Every product enforces strict database-level loan limits, fixed APR interest rates, and term durations.
+          <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider block mb-1">
+            Institutional Credit Catalog
+          </span>
+          <h2 className="text-xl font-semibold text-[#171717] tracking-tight">Standardized Loan Products</h2>
+          <p className="text-xs text-[#4d4d4d] mt-1">
+            Pre-configured credit products enforcing relational constraints, fixed APRs, and reducing-balance schedules.
           </p>
         </div>
 
         {user?.role === 'ADMIN' && (
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
+            className="btn-app-primary self-start md:self-auto"
           >
-            <span className="material-symbols-outlined text-base">add</span>
-            <span>{showCreateForm ? 'Close Form' : 'Create New Product'}</span>
+            <span className="material-symbols-outlined text-sm">add</span>
+            <span>{showCreateForm ? 'Close Form' : 'New Loan Product'}</span>
           </button>
         )}
       </section>
 
       {/* Admin Create Product Form */}
       {showCreateForm && (
-        <section className="bg-white rounded-2xl p-6 border border-blue-200 shadow-md">
-          <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-blue-600">settings_applications</span>
-            <span>Define New Loan Product (Admin Only)</span>
+        <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <h3 className="text-sm font-semibold text-[#171717] mb-3">
+            Create Loan Product (Administrator Privilege)
           </h3>
 
           {createError && (
-            <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+            <div className="mb-4 p-2.5 rounded-[6px] bg-[#fff5f5] border border-[#ffcccc] text-[#ee0000] text-xs">
               {createError}
             </div>
           )}
 
           <form onSubmit={handleCreateProduct} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Product Name</label>
+              <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Product Name</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. Micro-Biz Expansion 6M"
                 value={newProductName}
                 onChange={(e) => setNewProductName(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300"
+                className="input-geist w-full text-xs"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">APR Interest Rate (%)</label>
+              <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">APR Interest Rate (%)</label>
               <input
                 type="number"
                 step="0.01"
                 required
                 value={newInterestRate}
                 onChange={(e) => setNewInterestRate(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                className="input-geist w-full text-xs font-mono-num"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Tenure (Months)</label>
+              <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Tenure (Months)</label>
               <input
                 type="number"
                 required
                 value={newTermMonths}
                 onChange={(e) => setNewTermMonths(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                className="input-geist w-full text-xs font-mono-num"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Processing Fee (INR)</label>
+              <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Processing Fee (INR)</label>
               <input
                 type="number"
                 step="0.01"
                 value={newProcessingFee}
                 onChange={(e) => setNewProcessingFee(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                className="input-geist w-full text-xs font-mono-num"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Min Loan Amount (INR)</label>
+              <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Min Principal (INR)</label>
               <input
                 type="number"
                 required
                 value={newMinAmount}
                 onChange={(e) => setNewMinAmount(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                className="input-geist w-full text-xs font-mono-num"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Max Loan Amount (INR)</label>
+              <label className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] block mb-1">Max Principal (INR)</label>
               <input
                 type="number"
                 required
                 value={newMaxAmount}
                 onChange={(e) => setNewMaxAmount(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-mono-num"
+                className="input-geist w-full text-xs font-mono-num"
               />
             </div>
             <div className="sm:col-span-3 flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setShowCreateForm(false)}
-                className="py-2 px-4 rounded-lg border border-slate-300 text-xs font-semibold text-slate-600"
+                className="btn-app-ghost"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white shadow-xs"
+                className="btn-app-primary"
               >
-                Save Product to Catalog
+                Save Product
               </button>
             </div>
           </form>
         </section>
       )}
 
-      {/* Loan Products Grid */}
+      {/* Loan Products Grid (Geist Pricing Card Style) */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {products.map((p) => (
           <div
             key={p.productId}
-            className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col justify-between hover:border-blue-300 transition-all"
+            className="bg-white rounded-[16px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all"
           >
             <div>
-              <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-start justify-between pb-3 border-b border-[#f2f2f2]">
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">{p.productName}</h3>
-                  <span className="text-[11px] font-mono-num text-slate-500 font-medium">
-                    Product ID: #PRD-00{p.productId}
+                  <h3 className="font-semibold text-[#171717] text-base">{p.productName}</h3>
+                  <span className="font-geist-mono text-[11px] text-[#8f8f8f]">
+                    CATALOG ID: #PRD-00{p.productId}
                   </span>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold font-mono-num border border-blue-200">
+                <span className="font-geist-mono text-xs font-medium px-2 py-0.5 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#171717]">
                   {p.interestRate}% APR
                 </span>
               </div>
 
-              {/* Product Specifications Table */}
-              <div className="grid grid-cols-2 gap-3 my-4 text-xs font-mono-num">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-0.5">Loan Range</span>
-                  <span className="font-bold text-slate-900">
-                    {formatINR(p.minLoanAmount)} - {formatINR(p.maxLoanAmount)}
+              {/* Product Specifications Matrix */}
+              <div className="grid grid-cols-2 gap-2.5 my-4 text-xs font-geist-mono">
+                <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+                  <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Principal Range</span>
+                  <span className="font-medium text-[#171717] font-mono-num">
+                    {formatINR(p.minLoanAmount)} – {formatINR(p.maxLoanAmount)}
                   </span>
                 </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-0.5">Tenure Period</span>
-                  <span className="font-bold text-slate-900">{p.loanTermMonths} Installments (Months)</span>
+                <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+                  <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Term Length</span>
+                  <span className="font-medium text-[#171717]">{p.loanTermMonths} Months</span>
                 </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-0.5">Processing Fee</span>
-                  <span className="font-bold text-slate-900">{formatINR(p.processingFee)}</span>
+                <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+                  <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Processing Fee</span>
+                  <span className="font-medium text-[#171717] font-mono-num">{formatINR(p.processingFee)}</span>
                 </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-0.5">Calculation</span>
-                  <span className="font-bold text-blue-600">Reducing Balance</span>
+                <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+                  <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Formula</span>
+                  <span className="font-medium text-[#0070f3]">Reducing Balance</span>
                 </div>
               </div>
             </div>
@@ -236,10 +234,10 @@ export default function ProductsView({ setActiveTab }) {
             <div className="pt-2">
               <button
                 onClick={() => setSelectedProduct(p)}
-                className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+                className="btn-marketing-primary w-full text-xs py-2.5"
               >
-                <span className="material-symbols-outlined text-sm">bolt</span>
-                <span>Apply &amp; Disburse Instant Loan</span>
+                <span>Apply for Micro-Credit</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
             </div>
           </div>

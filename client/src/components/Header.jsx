@@ -22,150 +22,165 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-[0_1px_4px_rgba(0,0,0,0.03)] h-16">
-      <div className="h-full px-6 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#fafafa]/90 backdrop-blur-md border-b border-[#ebebeb] h-14">
+      <div className="h-full px-6 flex items-center justify-between max-w-7xl mx-auto">
         
-        {/* Left: Brand & Engine Specs */}
-        <div className="flex items-center gap-6">
+        {/* Left: Vercel Delta Brand & Breadcrumb */}
+        <div className="flex items-center gap-4">
           <div 
             onClick={() => setActiveTab('dashboard')}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 cursor-pointer group"
           >
-            {/* MicroLend SVG Logo */}
-            <div className="w-10 h-10 rounded-xl bg-[#0B192C] flex items-center justify-center shadow-sm">
-              <svg className="w-6 h-6" viewBox="0 0 48 48" fill="none">
-                <path d="M24 8L37 14V24C37 32 29.5 38.5 24 40C18.5 38.5 11 32 11 24V14L24 8Z" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M19 23L23 27L30 19" stroke="#10B981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="24" cy="24" r="3" fill="#0066FF" fillOpacity="0.3"/>
+            {/* Iconic Vercel Delta Glyph */}
+            <div className="w-6 h-6 flex items-center justify-center">
+              <svg width="18" height="16" viewBox="0 0 76 65" fill="#171717">
+                <path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/>
               </svg>
             </div>
-            <div className="flex flex-col leading-tight">
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-bold text-slate-900 tracking-tight">MicroLend</span>
-                <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Verified</span>
-              </div>
-              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Micro-Finance Portal</span>
-            </div>
+            <span className="font-semibold text-sm tracking-tight text-[#171717]">MicroLend</span>
           </div>
 
-          {/* Security Status Banner */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs text-slate-700 font-medium">Bank-Grade Security • 256-Bit SSL Encrypted</span>
-          </div>
+          <span className="text-[#a1a1a1] text-xs">/</span>
+
+          <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f] hidden sm:inline-block">
+            {activeTab}
+          </span>
         </div>
 
-        {/* Right: Live Balance & Account Switcher */}
-        <div className="flex items-center gap-4">
+        {/* Center / Nav Links (Desktop) */}
+        <nav className="hidden md:flex items-center gap-1">
+          {[
+            { id: 'dashboard', label: 'Dashboard' },
+            { id: 'loans', label: 'Loans' },
+            { id: 'wallet', label: 'Wallet' },
+            { id: 'ledger', label: 'Ledger' },
+            { id: 'inspector', label: 'Schema' },
+            { id: 'landing', label: 'Overview' },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`px-3 py-1 rounded-[6px] text-xs font-normal transition-colors ${
+                activeTab === item.id 
+                  ? 'text-[#171717] font-medium bg-[#f2f2f2]' 
+                  : 'text-[#4d4d4d] hover:text-[#171717] hover:bg-[#f5f5f5]'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Right: Live Balance & Persona Controls */}
+        <div className="flex items-center gap-3">
           
-          {/* Verified Balance Pill */}
+          {/* Geist Hairline Balance Badge */}
           {user && (
-            <div className="flex items-center gap-3 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Available Balance</span>
-                <span className="font-mono-num text-sm font-bold text-slate-900">
-                  {formatINR(wallet?.currentBalance)}
-                </span>
-              </div>
-              <div className="h-6 w-px bg-slate-200"></div>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 tracking-tight flex items-center gap-1">
-                <span className="material-symbols-outlined text-[12px]">verified</span> Active
+            <div className="flex items-center gap-2 px-2.5 py-1 bg-white border border-[#ebebeb] rounded-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.03)]">
+              <span className="font-geist-mono text-[11px] text-[#8f8f8f] uppercase">BAL</span>
+              <span className="font-mono-num text-xs font-medium text-[#171717]">
+                {formatINR(wallet?.currentBalance)}
               </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" title="PostgreSQL Real-Time Connected"></span>
             </div>
           )}
 
-          {/* User Persona / Switcher */}
+          {/* User Persona / Account Switcher */}
           {user ? (
             <div className="relative">
               <button
                 onClick={() => setShowPersonaMenu(!showPersonaMenu)}
-                className="flex items-center gap-2.5 p-1 pl-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-2 p-1 pl-2 bg-white border border-[#ebebeb] hover:border-[#a1a1a1] rounded-[6px] transition-colors shadow-[0_1px_1px_rgba(0,0,0,0.02)]"
               >
-                <div className="flex flex-col text-right hidden sm:flex">
-                  <span className="text-xs font-semibold text-slate-900">{user.fullName}</span>
-                  <span className="text-[10px] font-mono-num font-medium text-slate-500">
-                    {user.role === 'ADMIN' ? '👑 System Admin' : '👤 Active Borrower'}
-                  </span>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
-                  {user.fullName.split(' ').map(n => n[0]).join('')}
-                </div>
-                <span className="material-symbols-outlined text-slate-400 text-lg">arrow_drop_down</span>
+                <span className="text-xs font-medium text-[#171717] hidden sm:inline-block">
+                  {user.fullName}
+                </span>
+                <span className="font-geist-mono text-[10px] text-[#8f8f8f] px-1 py-0.2 bg-[#f2f2f2] rounded-[3px]">
+                  {user.role}
+                </span>
+                <span className="material-symbols-outlined text-[#8f8f8f] text-base">expand_more</span>
               </button>
 
-              {/* Persona Switcher Dropdown */}
+              {/* Elevated Floating Dropdown Menu (Level 2 Elevation) */}
               {showPersonaMenu && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-slate-100">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Switch Account Persona</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Test real-time borrower vs admin permissions</p>
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-[12px] shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-[#ebebeb] py-2 z-50">
+                  <div className="px-3.5 py-2 border-b border-[#f2f2f2]">
+                    <p className="font-geist-mono text-[10px] font-medium uppercase tracking-wider text-[#8f8f8f]">Switch User Persona</p>
+                    <p className="text-xs text-[#4d4d4d] mt-0.5">Toggle between borrower and administrator</p>
                   </div>
 
                   {/* Persona 1: Priya Sharma */}
                   <button
                     onClick={() => handleSwitchPersona('priya.sharma@example.com', 'Password@123')}
-                    className={`w-full px-4 py-2.5 text-left flex items-center justify-between hover:bg-slate-50 transition-colors ${user.email === 'priya.sharma@example.com' ? 'bg-blue-50/50' : ''}`}
+                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'priya.sharma@example.com' ? 'bg-[#f7f7f7]' : ''}`}
                   >
                     <div>
-                      <p className="text-xs font-semibold text-slate-900">Priya Sharma</p>
-                      <p className="text-[11px] text-slate-500">Borrower (Active Loan ₹45K)</p>
+                      <p className="text-xs font-medium text-[#171717]">Priya Sharma</p>
+                      <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Borrower (Active Loan ₹45K)</p>
                     </div>
                     {user.email === 'priya.sharma@example.com' && (
-                      <span className="material-symbols-outlined text-blue-600 text-base">check</span>
+                      <span className="material-symbols-outlined text-[#171717] text-sm">check</span>
                     )}
                   </button>
 
                   {/* Persona 2: Admin */}
                   <button
                     onClick={() => handleSwitchPersona('admin@microlend.org', 'AdminPassword@123')}
-                    className={`w-full px-4 py-2.5 text-left flex items-center justify-between hover:bg-slate-50 transition-colors ${user.role === 'ADMIN' ? 'bg-blue-50/50' : ''}`}
+                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.role === 'ADMIN' ? 'bg-[#f7f7f7]' : ''}`}
                   >
                     <div>
-                      <p className="text-xs font-semibold text-slate-900">System Administrator</p>
-                      <p className="text-[11px] text-slate-500">Institutional Governance & Audit</p>
+                      <p className="text-xs font-medium text-[#171717]">System Administrator</p>
+                      <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Institutional Audit & Control</p>
                     </div>
                     {user.role === 'ADMIN' && (
-                      <span className="material-symbols-outlined text-blue-600 text-base">check</span>
+                      <span className="material-symbols-outlined text-[#171717] text-sm">check</span>
                     )}
                   </button>
 
                   {/* Persona 3: Dr. Arvind Rao */}
                   <button
                     onClick={() => handleSwitchPersona('arvind.rao@example.com', 'Password@123')}
-                    className={`w-full px-4 py-2.5 text-left flex items-center justify-between hover:bg-slate-50 transition-colors ${user.email === 'arvind.rao@example.com' ? 'bg-blue-50/50' : ''}`}
+                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'arvind.rao@example.com' ? 'bg-[#f7f7f7]' : ''}`}
                   >
                     <div>
-                      <p className="text-xs font-semibold text-slate-900">Dr. Arvind Rao</p>
-                      <p className="text-[11px] text-slate-500">Borrower (Fresh Applicant)</p>
+                      <p className="text-xs font-medium text-[#171717]">Dr. Arvind Rao</p>
+                      <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Borrower (Zero Loans)</p>
                     </div>
                     {user.email === 'arvind.rao@example.com' && (
-                      <span className="material-symbols-outlined text-blue-600 text-base">check</span>
+                      <span className="material-symbols-outlined text-[#171717] text-sm">check</span>
                     )}
                   </button>
 
-                  <div className="border-t border-slate-100 my-1"></div>
+                  <div className="border-t border-[#f2f2f2] my-1"></div>
 
                   <button
                     onClick={() => {
                       logout();
                       setShowPersonaMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                    className="w-full px-3.5 py-1.5 text-left text-xs font-normal text-[#ee0000] hover:bg-[#fff5f5] flex items-center gap-1.5"
                   >
-                    <span className="material-symbols-outlined text-base">logout</span>
+                    <span className="material-symbols-outlined text-sm">logout</span>
                     Sign Out
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <button
-              onClick={onOpenAuthModal}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
-            >
-              <span className="material-symbols-outlined text-base">login</span>
-              Sign In / Register
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenAuthModal}
+                className="btn-app-ghost"
+              >
+                Log In
+              </button>
+              <button
+                onClick={onOpenAuthModal}
+                className="btn-app-primary"
+              >
+                Sign Up
+              </button>
+            </div>
           )}
 
         </div>
