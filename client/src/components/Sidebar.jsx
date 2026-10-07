@@ -12,7 +12,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     { id: 'products', label: 'Loan Products', icon: 'account_tree' },
     { id: 'ledger', label: 'Institutional Ledger', icon: 'receipt_long' },
     { id: 'inspector', label: 'DBMS Schema', icon: 'data_object' },
-    { id: 'landing', label: 'Documentation', icon: 'menu_book' },
   ] : [
     { id: 'dashboard', label: 'Dashboard', icon: 'space_dashboard' },
     { id: 'loans', label: 'Loans & EMIs', icon: 'credit_card' },
@@ -20,7 +19,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     { id: 'wallet', label: 'My Wallet', icon: 'account_balance_wallet' },
     { id: 'ledger', label: 'Transaction Ledger', icon: 'receipt_long' },
     { id: 'inspector', label: 'DBMS Schema', icon: 'data_object' },
-    { id: 'landing', label: 'Documentation', icon: 'menu_book' },
   ];
 
   return (

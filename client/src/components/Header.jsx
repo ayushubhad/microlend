@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
+export default function Header({ onOpenAuthModal, activeTab, setActiveTab, onSignOut }) {
   const { user, wallet, logout, login } = useAuth();
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
 
@@ -30,7 +30,7 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
         {/* Brand */}
         <div className="flex items-center gap-4">
           <div 
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => setActiveTab(user ? 'dashboard' : 'home')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
             <div className="w-6 h-6 flex items-center justify-center">
@@ -44,7 +44,7 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
           <span className="text-[#a1a1a1] text-xs">/</span>
 
           <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f] hidden sm:inline-block">
-            {activeTab}
+            {activeTab === 'home' ? 'OVERVIEW' : activeTab}
           </span>
         </div>
 
@@ -134,8 +134,12 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
 
                   <button
                     onClick={() => {
-                      logout();
                       setShowPersonaMenu(false);
+                      if (onSignOut) {
+                        onSignOut();
+                      } else {
+                        logout();
+                      }
                     }}
                     className="w-full px-3.5 py-1.5 text-left text-xs font-normal text-[#ee0000] hover:bg-[#fff5f5] flex items-center gap-1.5"
                   >
@@ -148,13 +152,13 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
           ) : (
             <div className="flex items-center gap-2">
               <button
-                onClick={onOpenAuthModal}
+                onClick={() => onOpenAuthModal && onOpenAuthModal()}
                 className="btn-app-ghost"
               >
                 Log In
               </button>
               <button
-                onClick={onOpenAuthModal}
+                onClick={() => onOpenAuthModal && onOpenAuthModal({ isRegister: true })}
                 className="btn-app-primary"
               >
                 Sign Up

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal({ isOpen, onClose, initialPreset = null }) {
   const { login, register } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,6 +14,21 @@ export default function AuthModal({ isOpen, onClose }) {
   const [address, setAddress] = useState('');
   const [aadhaar, setAadhaar] = useState('');
   const [initialDeposit, setInitialDeposit] = useState('10000');
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialPreset) {
+        setEmail(initialPreset.email || '');
+        setPassword(initialPreset.password || '');
+        setIsRegister(Boolean(initialPreset.isRegister));
+      } else {
+        setEmail('');
+        setPassword('');
+        setIsRegister(false);
+      }
+      setError(null);
+    }
+  }, [isOpen, initialPreset]);
 
   if (!isOpen) return null;
 
@@ -133,6 +148,69 @@ export default function AuthModal({ isOpen, onClose }) {
                 />
               </div>
             </>
+          )}
+
+          {!isRegister && (
+            <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-geist-mono text-[10px] uppercase text-[#8f8f8f] font-medium tracking-wide">
+                  Quick Persona Credentials
+                </span>
+                <span className="font-geist-mono text-[9px] text-[#8f8f8f]">PostgreSQL Seeded</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('priya@gmail.com');
+                    setPassword('Priya123');
+                    setError(null);
+                  }}
+                  className={`p-2 text-left rounded-[6px] border transition-all ${
+                    email === 'priya@gmail.com'
+                      ? 'border-[#171717] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
+                      : 'border-[#ebebeb] bg-white hover:border-[#a1a1a1]'
+                  }`}
+                >
+                  <span className="block text-[11px] font-medium text-[#171717] truncate">Priya Sharma</span>
+                  <span className="block font-geist-mono text-[9px] text-[#8f8f8f] truncate">Active Borrower</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('arvind@gmail.com');
+                    setPassword('Arvind123');
+                    setError(null);
+                  }}
+                  className={`p-2 text-left rounded-[6px] border transition-all ${
+                    email === 'arvind@gmail.com'
+                      ? 'border-[#171717] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
+                      : 'border-[#ebebeb] bg-white hover:border-[#a1a1a1]'
+                  }`}
+                >
+                  <span className="block text-[11px] font-medium text-[#171717] truncate">Dr. Arvind Rao</span>
+                  <span className="block font-geist-mono text-[9px] text-[#8f8f8f] truncate">Zero Loans</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('admin@gov.in');
+                    setPassword('Admin123');
+                    setError(null);
+                  }}
+                  className={`p-2 text-left rounded-[6px] border transition-all ${
+                    email === 'admin@gov.in'
+                      ? 'border-[#171717] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
+                      : 'border-[#ebebeb] bg-white hover:border-[#a1a1a1]'
+                  }`}
+                >
+                  <span className="block text-[11px] font-medium text-[#171717] truncate">Admin</span>
+                  <span className="block font-geist-mono text-[9px] text-[#8f8f8f] truncate">Loan Officer</span>
+                </button>
+              </div>
+            </div>
           )}
 
           <div>

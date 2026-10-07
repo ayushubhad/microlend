@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
     if (token) {
       fetchUser(token);
     } else {
-      login('priya@gmail.com', 'Priya123').finally(() => setLoading(false));
+      setLoading(false);
     }
   }, [token]);
 

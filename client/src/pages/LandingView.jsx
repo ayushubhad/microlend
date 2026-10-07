@@ -1,16 +1,19 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingView({ setActiveTab, onOpenAuthModal }) {
+  const { user } = useAuth();
+
   return (
-    <div className="flex flex-col gap-16 py-4 max-w-6xl mx-auto">
+    <div className="flex flex-col gap-14 py-4 max-w-6xl mx-auto">
       
       {/* Hero Section */}
-      <section className="relative rounded-[20px] p-8 sm:p-14 md:p-20 border border-[#ebebeb] overflow-hidden bg-white hero-mesh-gradient">
+      <section className="relative rounded-[20px] p-8 sm:p-14 md:p-18 border border-[#ebebeb] overflow-hidden bg-white hero-mesh-gradient">
         <div className="max-w-3xl relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[100px] bg-white border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#171717] animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
             <span className="font-geist-mono text-xs uppercase tracking-wider text-[#171717] font-medium">
-              Academic DBMS Capstone // AY 2026–27
+              Academic DBMS Capstone // Micro-Finance Engine
             </span>
           </div>
 
@@ -23,19 +26,170 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
           </p>
 
           <div className="flex flex-wrap items-center gap-3 mt-8">
+            {user ? (
+              <>
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className="btn-marketing-primary"
+                >
+                  <span>Go to Dashboard</span>
+                  <span className="material-symbols-outlined text-base">arrow_forward</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('inspector')}
+                  className="btn-marketing-secondary"
+                >
+                  <span className="material-symbols-outlined text-base">account_tree</span>
+                  <span>Inspect DBMS Schema</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => onOpenAuthModal && onOpenAuthModal()}
+                  className="btn-marketing-primary"
+                >
+                  <span>Sign In to Account</span>
+                  <span className="material-symbols-outlined text-base">login</span>
+                </button>
+                <button
+                  onClick={() => onOpenAuthModal && onOpenAuthModal({ isRegister: true })}
+                  className="btn-marketing-secondary"
+                >
+                  <span className="material-symbols-outlined text-base">person_add</span>
+                  <span>Register as Borrower</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Persona Access Section */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-semibold text-[#171717] tracking-tight">
+              Pre-Configured System Personas
+            </h2>
+            <p className="text-xs text-[#8f8f8f]">
+              Direct one-click sign in with pre-seeded database accounts or enter custom credentials in the login form.
+            </p>
+          </div>
+          <span className="font-geist-mono text-[11px] text-[#8f8f8f] uppercase">
+            3 Accounts Seeded // BCRYPT Verified
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Priya Sharma */}
+          <div className="p-6 bg-white rounded-[16px] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-geist-mono text-[10px] uppercase px-2 py-0.5 rounded-[4px] bg-[#f2f2f2] text-[#171717] font-medium">
+                  Borrower Persona
+                </span>
+                <span className="w-2 h-2 rounded-full bg-[#10b981]" title="Active Loan"></span>
+              </div>
+              <h3 className="font-semibold text-base text-[#171717]">Priya Sharma</h3>
+              <p className="font-geist-mono text-xs text-[#8f8f8f] mt-0.5">priya@gmail.com</p>
+
+              <div className="my-4 pt-3 border-t border-[#f2f2f2] space-y-1.5 text-xs text-[#4d4d4d]">
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Portfolio:</span>
+                  <span className="font-medium text-[#171717]">Active ₹45,000 Loan</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Schedule:</span>
+                  <span>12 Months Amortized</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Access:</span>
+                  <span>Wallet, EMIs, Repayment</span>
+                </div>
+              </div>
+            </div>
+
             <button
-              onClick={() => setActiveTab('dashboard')}
-              className="btn-marketing-primary"
+              onClick={() => onOpenAuthModal && onOpenAuthModal({ email: 'priya@gmail.com', password: 'Priya123' })}
+              className="w-full mt-2 btn-app-ghost text-xs justify-center font-medium hover:bg-[#171717] hover:text-white transition-colors"
             >
-              <span>Launch Dashboard</span>
-              <span className="material-symbols-outlined text-base">arrow_forward</span>
+              <span className="material-symbols-outlined text-sm">login</span>
+              <span>Sign In as Priya</span>
             </button>
+          </div>
+
+          {/* Dr. Arvind Rao */}
+          <div className="p-6 bg-white rounded-[16px] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-geist-mono text-[10px] uppercase px-2 py-0.5 rounded-[4px] bg-[#f2f2f2] text-[#171717] font-medium">
+                  Borrower Persona
+                </span>
+                <span className="w-2 h-2 rounded-full bg-[#0070f3]" title="Clean Slate"></span>
+              </div>
+              <h3 className="font-semibold text-base text-[#171717]">Dr. Arvind Rao</h3>
+              <p className="font-geist-mono text-xs text-[#8f8f8f] mt-0.5">arvind@gmail.com</p>
+
+              <div className="my-4 pt-3 border-t border-[#f2f2f2] space-y-1.5 text-xs text-[#4d4d4d]">
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Portfolio:</span>
+                  <span className="font-medium text-[#171717]">Zero Active Loans</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">KYC Status:</span>
+                  <span>Pre-Verified Aadhaar</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Access:</span>
+                  <span>Apply for New Micro-Loans</span>
+                </div>
+              </div>
+            </div>
+
             <button
-              onClick={() => setActiveTab('inspector')}
-              className="btn-marketing-secondary"
+              onClick={() => onOpenAuthModal && onOpenAuthModal({ email: 'arvind@gmail.com', password: 'Arvind123' })}
+              className="w-full mt-2 btn-app-ghost text-xs justify-center font-medium hover:bg-[#171717] hover:text-white transition-colors"
             >
-              <span className="material-symbols-outlined text-base">account_tree</span>
-              <span>Inspect DBMS Schema</span>
+              <span className="material-symbols-outlined text-sm">login</span>
+              <span>Sign In as Dr. Arvind</span>
+            </button>
+          </div>
+
+          {/* System Administrator */}
+          <div className="p-6 bg-white rounded-[16px] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-[#171717] transition-all">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-geist-mono text-[10px] uppercase px-2 py-0.5 rounded-[4px] bg-[#171717] text-white font-medium">
+                  Loan Officer Console
+                </span>
+                <span className="w-2 h-2 rounded-full bg-[#7928ca]" title="Administrator"></span>
+              </div>
+              <h3 className="font-semibold text-base text-[#171717]">System Administrator</h3>
+              <p className="font-geist-mono text-xs text-[#8f8f8f] mt-0.5">admin@gov.in</p>
+
+              <div className="my-4 pt-3 border-t border-[#f2f2f2] space-y-1.5 text-xs text-[#4d4d4d]">
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Privileges:</span>
+                  <span className="font-medium text-[#171717]">Authorization & Underwriting</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Supervision:</span>
+                  <span>Borrower Directory & Profiles</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#8f8f8f]">Ledger Audit:</span>
+                  <span>Institutional Multi-Ledger</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => onOpenAuthModal && onOpenAuthModal({ email: 'admin@gov.in', password: 'Admin123' })}
+              className="w-full mt-2 btn-app-ghost text-xs justify-center font-medium hover:bg-[#171717] hover:text-white transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">shield_person</span>
+              <span>Sign In as Officer</span>
             </button>
           </div>
         </div>
@@ -186,13 +340,13 @@ COMMIT;`}
           Explore the Live MicroLend Engine
         </h2>
         <p className="text-[#4d4d4d] text-sm max-w-md mb-6">
-          Log in with pre-seeded borrower or admin personas to test transactions, apply for loans, and run live concurrency simulations.
+          Access the platform using pre-seeded borrower or officer personas to test live transactions, loan amortizations, and institutional ledger audits.
         </p>
         <button
-          onClick={() => setActiveTab('dashboard')}
+          onClick={user ? () => setActiveTab('dashboard') : () => onOpenAuthModal && onOpenAuthModal()}
           className="btn-marketing-primary"
         >
-          <span>Open Web Application</span>
+          <span>{user ? 'Return to Dashboard' : 'Open Sign In Modal'}</span>
           <span className="material-symbols-outlined text-base">arrow_forward</span>
         </button>
       </section>
