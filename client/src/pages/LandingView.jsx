@@ -195,19 +195,6 @@ export default function LandingView({ setActiveTab, onOpenAuthModal }) {
         </div>
       </section>
 
-      {/* Spec Strip */}
-      <section className="py-4 border-y border-[#ebebeb] bg-[#fafafa]">
-        <div className="flex flex-wrap items-center justify-between gap-6 px-4 text-xs font-geist-mono text-[#8f8f8f]">
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
-            VIDYALANKAR INSTITUTE OF TECHNOLOGY (VIT)
-          </span>
-          <span>POSTGRESQL 18.4 RELATIONAL ENGINE</span>
-          <span>ACID OLTP TRANSACTIONS</span>
-          <span>REDUCING BALANCE AMORTIZATION</span>
-          <span>THIRD NORMAL FORM (3NF)</span>
-        </div>
-      </section>
 
       {/* Architectural Pillars */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
