@@ -142,7 +142,7 @@ export default function DashboardView({ setActiveTab }) {
               </div>
 
               <div className="flex items-center gap-3 text-xs text-[#8f8f8f] mt-1 font-geist-mono flex-wrap">
-                <span>{user?.email || 'admin@microlend.org'}</span>
+                <span>{user?.email || 'admin@gov.in'}</span>
                 <span>•</span>
                 <span>Institutional Portfolio &amp; Risk Management</span>
               </div>

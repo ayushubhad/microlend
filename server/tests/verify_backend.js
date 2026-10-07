@@ -66,8 +66,8 @@ function get(path, token) {
 async function runTests() {
   console.log('--- 1. Testing Login ---');
   const loginRes = await post('/api/auth/login', {
-    email: 'priya.sharma@example.com',
-    password: 'Password@123'
+    email: 'priya@gmail.com',
+    password: 'Priya123'
   });
   console.log('Login Status:', loginRes.status, 'User:', loginRes.body.user.fullName, 'Balance:', loginRes.body.user.walletBalance);
   const token = loginRes.body.token;

@@ -7,9 +7,9 @@ TRUNCATE emi_schedules, transaction_ledger, loan_accounts, wallets, users, loan_
 -- 2. INSERT USERS (Admin and Sample Borrowers)
 INSERT INTO users (user_id, full_name, email, phone_number, password_hash, role, address, aadhaar_number, wallet_balance)
 VALUES 
-    ('a0000000-0000-0000-0000-000000000001', 'System Administrator', 'admin@microlend.org', '+919876543210', '$2b$10$G2ActfWROl0F1FMrK2X2..2kcRcvnxOzqJVUxl6fi1nxp5CH.ohhO', 'ADMIN', 'VIT Campus, Wadala East, Mumbai, Maharashtra 400037', '123456789012', 1000000.00),
-    ('b0000000-0000-0000-0000-000000000002', 'Priya Sharma', 'priya.sharma@example.com', '+919820012345', '$2b$10$TMKEqjBRkC6DDIWPngqFpe5Lk916H3Ont3dT1YfSlXpp1GmhS2nmO', 'USER', 'B-402, Green Meadows, Andheri East, Mumbai 400069', '987654328921', 24500.00),
-    ('c0000000-0000-0000-0000-000000000003', 'Dr. Arvind Rao', 'arvind.rao@example.com', '+919833445566', '$2b$10$TMKEqjBRkC6DDIWPngqFpe5Lk916H3Ont3dT1YfSlXpp1GmhS2nmO', 'USER', '12/A, Sea Breeze Apartments, Dadar West, Mumbai 400028', '543210987654', 15000.00);
+    ('a0000000-0000-0000-0000-000000000001', 'System Administrator', 'admin@gov.in', '+919876543210', '$2b$10$rwn0IyovIobRw0Ed4M12vuoRMyiG2/c4OmCdBkoj2LHqfeyCJAnYe', 'ADMIN', 'VIT Campus, Wadala East, Mumbai, Maharashtra 400037', '123456789012', 1000000.00),
+    ('b0000000-0000-0000-0000-000000000002', 'Priya Sharma', 'priya@gmail.com', '+919820012345', '$2b$10$JgPa7MhIsyuqHoue/SQnLeamXjLgonLCk.UjUmWMVQAtEW/bacNb.', 'USER', 'B-402, Green Meadows, Andheri East, Mumbai 400069', '987654328921', 24500.00),
+    ('c0000000-0000-0000-0000-000000000003', 'Dr. Arvind Rao', 'arvind@gmail.com', '+919833445566', '$2b$10$3xSrHlLsIFwkFFjb9bd.9un3V9Vqq0nA78qT3w62dfNu.Ran2YBdW', 'USER', '12/A, Sea Breeze Apartments, Dadar West, Mumbai 400028', '543210987654', 15000.00);
 
 -- 3. INSERT WALLETS (1:1 with users)
 INSERT INTO wallets (wallet_id, user_id, current_balance)

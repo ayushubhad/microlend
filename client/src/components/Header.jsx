@@ -92,20 +92,20 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                   </div>
 
                   <button
-                    onClick={() => handleSwitchPersona('priya.sharma@example.com', 'Password@123')}
-                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'priya.sharma@example.com' ? 'bg-[#f7f7f7]' : ''}`}
+                    onClick={() => handleSwitchPersona('priya@gmail.com', 'Priya123')}
+                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'priya@gmail.com' ? 'bg-[#f7f7f7]' : ''}`}
                   >
                     <div>
                       <p className="text-xs font-medium text-[#171717]">Priya Sharma</p>
                       <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Borrower (Active Loan ₹45K)</p>
                     </div>
-                    {user.email === 'priya.sharma@example.com' && (
+                    {user.email === 'priya@gmail.com' && (
                       <span className="material-symbols-outlined text-[#171717] text-sm">check</span>
                     )}
                   </button>
 
                   <button
-                    onClick={() => handleSwitchPersona('admin@microlend.org', 'AdminPassword@123')}
+                    onClick={() => handleSwitchPersona('admin@gov.in', 'Admin123')}
                     className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.role === 'ADMIN' ? 'bg-[#f7f7f7]' : ''}`}
                   >
                     <div>
@@ -118,14 +118,14 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                   </button>
 
                   <button
-                    onClick={() => handleSwitchPersona('arvind.rao@example.com', 'Password@123')}
-                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'arvind.rao@example.com' ? 'bg-[#f7f7f7]' : ''}`}
+                    onClick={() => handleSwitchPersona('arvind@gmail.com', 'Arvind123')}
+                    className={`w-full px-3.5 py-2 text-left flex items-center justify-between hover:bg-[#fafafa] transition-colors ${user.email === 'arvind@gmail.com' ? 'bg-[#f7f7f7]' : ''}`}
                   >
                     <div>
                       <p className="text-xs font-medium text-[#171717]">Dr. Arvind Rao</p>
                       <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Borrower (Zero Loans)</p>
                     </div>
-                    {user.email === 'arvind.rao@example.com' && (
+                    {user.email === 'arvind@gmail.com' && (
                       <span className="material-symbols-outlined text-[#171717] text-sm">check</span>
                     )}
                   </button>
