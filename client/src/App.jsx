@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import DashboardView from './pages/DashboardView';
+import ApprovalsView from './pages/ApprovalsView';
+import BorrowersView from './pages/BorrowersView';
 import WalletView from './pages/WalletView';
 import ProductsView from './pages/ProductsView';
 import LoansView from './pages/LoansView';
@@ -43,6 +45,8 @@ function MainApp() {
       <main className="pl-64 pt-16 min-h-screen">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {activeTab === 'dashboard' && <DashboardView setActiveTab={setActiveTab} />}
+          {activeTab === 'approvals' && <ApprovalsView setActiveTab={setActiveTab} />}
+          {activeTab === 'borrowers' && <BorrowersView setActiveTab={setActiveTab} />}
           {activeTab === 'wallet' && <WalletView />}
           {activeTab === 'products' && <ProductsView setActiveTab={setActiveTab} />}
           {activeTab === 'loans' && <LoansView setActiveTab={setActiveTab} />}

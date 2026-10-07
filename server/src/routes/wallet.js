@@ -46,6 +46,13 @@ router.get('/', authenticateToken, async (req, res) => {
 router.post('/credit', authenticateToken, async (req, res) => {
   const startTime = Date.now();
   try {
+    if (req.user.role === 'ADMIN') {
+      return res.status(403).json({
+        success: false,
+        error: 'Access Denied: Administrative loan officers cannot conduct personal wallet transactions.'
+      });
+    }
+
     const amount = parseFloat(req.body.amount);
     const rawRemarks = req.body.remarks || 'Digital wallet deposit';
     const remarks = String(rawRemarks).replace(/₹/g, 'INR ').replace(/[^\x00-\x7F]/g, '');
@@ -130,6 +137,13 @@ router.post('/credit', authenticateToken, async (req, res) => {
 router.post('/debit', authenticateToken, async (req, res) => {
   const startTime = Date.now();
   try {
+    if (req.user.role === 'ADMIN') {
+      return res.status(403).json({
+        success: false,
+        error: 'Access Denied: Administrative loan officers cannot conduct personal wallet transactions.'
+      });
+    }
+
     const amount = parseFloat(req.body.amount);
     const rawRemarks = req.body.remarks || 'Digital wallet withdrawal';
     const remarks = String(rawRemarks).replace(/₹/g, 'INR ').replace(/[^\x00-\x7F]/g, '');

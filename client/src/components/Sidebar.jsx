@@ -3,28 +3,31 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
-  const navItems = [
+  const navItems = isAdmin ? [
+    { id: 'dashboard', label: 'Officer Dashboard', icon: 'space_dashboard' },
+    { id: 'approvals', label: 'Loan Approvals', icon: 'fact_check' },
+    { id: 'borrowers', label: 'Borrower Directory', icon: 'group' },
+    { id: 'products', label: 'Loan Products', icon: 'account_tree' },
+    { id: 'ledger', label: 'Institutional Ledger', icon: 'receipt_long' },
+    { id: 'inspector', label: 'DBMS Schema', icon: 'data_object' },
+    { id: 'landing', label: 'Documentation', icon: 'menu_book' },
+  ] : [
     { id: 'dashboard', label: 'Dashboard', icon: 'space_dashboard' },
     { id: 'loans', label: 'Loans & EMIs', icon: 'credit_card' },
     { id: 'products', label: 'Loan Products', icon: 'account_tree' },
     { id: 'wallet', label: 'My Wallet', icon: 'account_balance_wallet' },
     { id: 'ledger', label: 'Transaction Ledger', icon: 'receipt_long' },
     { id: 'inspector', label: 'DBMS Schema', icon: 'data_object' },
-    { id: 'landing', label: 'Overview Docs', icon: 'menu_book' },
+    { id: 'landing', label: 'Documentation', icon: 'menu_book' },
   ];
 
   return (
     <aside className="fixed left-0 top-14 bottom-0 w-64 bg-[#fafafa] border-r border-[#ebebeb] z-40 flex flex-col justify-between py-5">
       
       {/* Top Nav Section */}
-      <div className="px-3 flex flex-col gap-4">
-        <div>
-          <span className="font-geist-mono text-[11px] font-medium text-[#8f8f8f] uppercase tracking-wider px-3">
-            Core Modules
-          </span>
-        </div>
-
+      <div className="px-3 flex flex-col gap-2">
         <nav className="flex flex-col gap-0.5">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
@@ -45,11 +48,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                   <span>{item.label}</span>
                 </div>
 
-                {item.id === 'inspector' && (
-                  <span className="font-geist-mono text-[9px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-white text-[#8f8f8f]">
-                    3NF
-                  </span>
-                )}
                 {item.id === 'ledger' && (
                   <span className="font-geist-mono text-[9px] uppercase px-1.5 py-0.2 rounded-[4px] border border-[#ebebeb] bg-white text-[#8f8f8f]">
                     Audit

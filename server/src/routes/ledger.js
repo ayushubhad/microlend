@@ -10,21 +10,32 @@ const router = express.Router();
  */
 router.get('/my-history', authenticateToken, async (req, res) => {
   try {
-    const ledgerRes = await query(
-      `SELECT t.transaction_id, t.wallet_id, t.loan_id, t.transaction_type, 
-              t.amount, t.balance_after_transaction, t.transaction_date, 
-              t.reference_no, t.remarks,
-              p.product_name
-       FROM transaction_ledger t
-       LEFT JOIN loan_accounts l ON t.loan_id = l.loan_id
-       LEFT JOIN loan_products p ON l.product_id = p.product_id
-       WHERE t.user_id = $1
-       ORDER BY t.transaction_date DESC`,
-      [req.user.userId]
-    );
+    const isAdmin = req.user.role === 'ADMIN';
+    let queryText = `
+      SELECT t.transaction_id, t.user_id, u.full_name as user_name, u.email as user_email,
+             t.wallet_id, t.loan_id, t.transaction_type, 
+             t.amount, t.balance_after_transaction, t.transaction_date, 
+             t.reference_no, t.remarks,
+             p.product_name
+      FROM transaction_ledger t
+      JOIN users u ON t.user_id = u.user_id
+      LEFT JOIN loan_accounts l ON t.loan_id = l.loan_id
+      LEFT JOIN loan_products p ON l.product_id = p.product_id
+    `;
+    const params = [];
+    if (!isAdmin) {
+      queryText += ` WHERE t.user_id = $1`;
+      params.push(req.user.userId);
+    }
+    queryText += ` ORDER BY t.transaction_date DESC`;
+
+    const ledgerRes = await query(queryText, params);
 
     const transactions = ledgerRes.rows.map(t => ({
       transactionId: t.transaction_id,
+      userId: t.user_id,
+      userName: t.user_name,
+      userEmail: t.user_email,
       transactionType: t.transaction_type,
       amount: parseFloat(t.amount),
       balanceAfter: parseFloat(t.balance_after_transaction),
@@ -38,6 +49,46 @@ router.get('/my-history', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Fetch Ledger Error:', err);
     res.status(500).json({ success: false, error: 'Failed to retrieve transaction history' });
+  }
+});
+
+/**
+ * GET /api/ledger/all
+ * Institutional ledger across all managed users for administrator.
+ */
+router.get('/all', authenticateToken, requireRole('ADMIN'), async (req, res) => {
+  try {
+    const ledgerRes = await query(
+      `SELECT t.transaction_id, t.user_id, u.full_name as user_name, u.email as user_email,
+              t.wallet_id, t.loan_id, t.transaction_type, 
+              t.amount, t.balance_after_transaction, t.transaction_date, 
+              t.reference_no, t.remarks,
+              p.product_name
+       FROM transaction_ledger t
+       JOIN users u ON t.user_id = u.user_id
+       LEFT JOIN loan_accounts l ON t.loan_id = l.loan_id
+       LEFT JOIN loan_products p ON l.product_id = p.product_id
+       ORDER BY t.transaction_date DESC`
+    );
+
+    const transactions = ledgerRes.rows.map(t => ({
+      transactionId: t.transaction_id,
+      userId: t.user_id,
+      userName: t.user_name,
+      userEmail: t.user_email,
+      transactionType: t.transaction_type,
+      amount: parseFloat(t.amount),
+      balanceAfter: parseFloat(t.balance_after_transaction),
+      transactionDate: t.transaction_date,
+      referenceNo: t.reference_no,
+      remarks: t.remarks,
+      productName: t.product_name || null
+    }));
+
+    res.json({ success: true, count: transactions.length, transactions });
+  } catch (err) {
+    console.error('Fetch All Ledger Error:', err);
+    res.status(500).json({ success: false, error: 'Failed to retrieve institutional ledger' });
   }
 });
 

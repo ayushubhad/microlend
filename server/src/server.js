@@ -34,6 +34,7 @@ app.use('/api/loans', require('./routes/loans'));
 app.use('/api/emi', require('./routes/emi'));
 app.use('/api/ledger', require('./routes/ledger'));
 app.use('/api/inspector', require('./routes/inspector'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Health check endpoint
 app.get('/api/health', async (req, res) => {

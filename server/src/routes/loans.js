@@ -11,6 +11,13 @@ const router = express.Router();
  */
 router.post('/apply', authenticateToken, async (req, res) => {
   try {
+    if (req.user.role === 'ADMIN') {
+      return res.status(403).json({
+        success: false,
+        error: 'Access Denied: Administrative loan officers cannot apply for personal micro-loans.'
+      });
+    }
+
     const { product_id, loan_amount } = req.body;
     const amount = parseFloat(loan_amount);
 
@@ -79,6 +86,47 @@ router.post('/apply', authenticateToken, async (req, res) => {
 });
 
 /**
+ * GET /api/loans/pending
+ * Officer/Admin retrieves all loan applications awaiting review.
+ */
+router.get('/pending', authenticateToken, requireRole('ADMIN'), async (req, res) => {
+  try {
+    const loansRes = await query(
+      `SELECT l.loan_id, l.user_id, u.full_name as borrower_name, u.email as borrower_email, u.phone_number as borrower_phone,
+              p.product_id, p.product_name, p.loan_term_months, p.processing_fee,
+              l.loan_amount, l.interest_rate, l.emi_amount, l.total_payable, l.created_at
+       FROM loan_accounts l
+       JOIN users u ON l.user_id = u.user_id
+       JOIN loan_products p ON l.product_id = p.product_id
+       WHERE l.loan_status = 'PENDING'
+       ORDER BY l.created_at DESC`
+    );
+
+    const formatted = loansRes.rows.map(l => ({
+      loanId: l.loan_id,
+      borrowerId: l.user_id,
+      borrowerName: l.borrower_name,
+      borrowerEmail: l.borrower_email,
+      borrowerPhone: l.borrower_phone,
+      productId: l.product_id,
+      productName: l.product_name,
+      termMonths: l.loan_term_months,
+      processingFee: parseFloat(l.processing_fee || '0.00'),
+      loanAmount: parseFloat(l.loan_amount),
+      interestRate: parseFloat(l.interest_rate),
+      emiAmount: parseFloat(l.emi_amount),
+      totalPayable: parseFloat(l.total_payable),
+      createdAt: l.created_at
+    }));
+
+    res.json({ success: true, count: formatted.length, pendingLoans: formatted });
+  } catch (err) {
+    console.error('Fetch Pending Loans Error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
  * POST /api/loans/:id/approve
  * Admin approves a pending loan application.
  */
@@ -111,6 +159,44 @@ router.post('/:id/approve', authenticateToken, requireRole('ADMIN'), async (req,
     res.json({ success: true, message: 'Loan approved successfully', data: result });
   } catch (err) {
     console.error('Loan Approval Error:', err);
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/loans/:id/reject
+ * Admin rejects a pending loan application.
+ */
+router.post('/:id/reject', authenticateToken, requireRole('ADMIN'), async (req, res) => {
+  try {
+    const loanId = req.params.id;
+    const { reason } = req.body;
+
+    const result = await withTransaction(async (client) => {
+      const lockRes = await client.query(
+        `SELECT loan_id, loan_status FROM loan_accounts WHERE loan_id = $1 FOR UPDATE`,
+        [loanId]
+      );
+
+      if (lockRes.rowCount === 0) {
+        throw new Error('Loan account not found');
+      }
+
+      if (lockRes.rows[0].loan_status !== 'PENDING') {
+        throw new Error(`Cannot reject loan: Current status is '${lockRes.rows[0].loan_status}'`);
+      }
+
+      await client.query(
+        `UPDATE loan_accounts SET loan_status = 'REJECTED' WHERE loan_id = $1`,
+        [loanId]
+      );
+
+      return { loanId, status: 'REJECTED', reason: reason || 'Application declined by Loan Officer' };
+    });
+
+    res.json({ success: true, message: 'Loan application rejected', data: result });
+  } catch (err) {
+    console.error('Loan Rejection Error:', err);
     res.status(400).json({ success: false, error: err.message });
   }
 });

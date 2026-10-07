@@ -125,6 +125,7 @@ export default function LedgerView() {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
+                  {user?.role === 'ADMIN' && <th className="py-2 px-3 font-medium">Borrower</th>}
                   <th className="py-2 px-3 font-medium">Reference Code</th>
                   <th className="py-2 px-3 font-medium">Operation</th>
                   <th className="py-2 px-3 font-medium">Amount</th>
@@ -136,6 +137,12 @@ export default function LedgerView() {
               <tbody className="divide-y divide-[#f2f2f2] font-mono-num">
                 {filteredTxns.map((t) => (
                   <tr key={t.transactionId} className="hover:bg-[#fafafa] transition-colors">
+                    {user?.role === 'ADMIN' && (
+                      <td className="py-2.5 px-3">
+                        <span className="font-sans font-medium text-[#171717]">{t.userName || 'System'}</span>
+                        <span className="font-geist-mono text-[10px] text-[#8f8f8f] block">{t.userEmail}</span>
+                      </td>
+                    )}
                     <td className="py-2.5 px-3 font-medium text-[#171717]">{t.referenceNo}</td>
                     <td className="py-2.5 px-3">
                       <span className="font-geist-mono text-[10px] px-1.5 py-0.5 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#4d4d4d]">

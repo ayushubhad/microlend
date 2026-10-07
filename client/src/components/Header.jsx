@@ -21,6 +21,8 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
     }
   };
 
+  const isAdmin = user?.role === 'ADMIN';
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#fafafa]/90 backdrop-blur-md border-b border-[#ebebeb] h-14">
       <div className="h-full px-6 flex items-center justify-between max-w-7xl mx-auto">
@@ -47,42 +49,27 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
           </span>
         </div>
 
-        {/* Center / Nav Links (Desktop) */}
-        <nav className="hidden md:flex items-center gap-1">
-          {[
-            { id: 'dashboard', label: 'Dashboard' },
-            { id: 'loans', label: 'Loans' },
-            { id: 'wallet', label: 'Wallet' },
-            { id: 'ledger', label: 'Ledger' },
-            { id: 'inspector', label: 'Schema' },
-            { id: 'landing', label: 'Overview' },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`px-3 py-1 rounded-[6px] text-xs font-normal transition-colors ${
-                activeTab === item.id 
-                  ? 'text-[#171717] font-medium bg-[#f2f2f2]' 
-                  : 'text-[#4d4d4d] hover:text-[#171717] hover:bg-[#f5f5f5]'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-
-        {/* Right: Live Balance & Persona Controls */}
+        {/* Right: Balance / Role Status & Persona Controls */}
         <div className="flex items-center gap-3">
           
-          {/* Geist Hairline Balance Badge */}
+          {/* Status Badge: Balance for Borrowers, Officer Badge for Admins */}
           {user && (
-            <div className="flex items-center gap-2 px-2.5 py-1 bg-white border border-[#ebebeb] rounded-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.03)]">
-              <span className="font-geist-mono text-[11px] text-[#8f8f8f] uppercase">BAL</span>
-              <span className="font-mono-num text-xs font-medium text-[#171717]">
-                {formatINR(wallet?.currentBalance)}
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" title="PostgreSQL Real-Time Connected"></span>
-            </div>
+            isAdmin ? (
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-white border border-[#ebebeb] rounded-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.03)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+                <span className="font-geist-mono text-[11px] text-[#171717] font-medium tracking-wide">
+                  OFFICER CONSOLE
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-white border border-[#ebebeb] rounded-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.03)]">
+                <span className="font-geist-mono text-[11px] text-[#8f8f8f] uppercase">BAL</span>
+                <span className="font-mono-num text-xs font-medium text-[#171717]">
+                  {formatINR(wallet?.currentBalance)}
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" title="PostgreSQL Connected"></span>
+              </div>
+            )
           )}
 
           {/* User Persona / Account Switcher */}
@@ -101,7 +88,7 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                 <span className="material-symbols-outlined text-[#8f8f8f] text-base">expand_more</span>
               </button>
 
-              {/* Elevated Floating Dropdown Menu (Level 2 Elevation) */}
+              {/* Elevated Floating Dropdown Menu */}
               {showPersonaMenu && (
                 <div className="absolute right-0 mt-2 w-72 bg-white rounded-[12px] shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-[#ebebeb] py-2 z-50">
                   <div className="px-3.5 py-2 border-b border-[#f2f2f2]">
@@ -130,7 +117,7 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab }) {
                   >
                     <div>
                       <p className="text-xs font-medium text-[#171717]">System Administrator</p>
-                      <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Institutional Audit & Control</p>
+                      <p className="font-geist-mono text-[10px] text-[#8f8f8f]">Loan Officer & Institutional Audit</p>
                     </div>
                     {user.role === 'ADMIN' && (
                       <span className="material-symbols-outlined text-[#171717] text-sm">check</span>

@@ -4,23 +4,36 @@ import { formatINR, DepositModal, WithdrawModal, RepayEmiModal } from '../compon
 
 export default function DashboardView({ setActiveTab }) {
   const { user, wallet, token, refreshWallet } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
+  // Borrower states
   const [loans, setLoans] = useState([]);
   const [upcomingEmis, setUpcomingEmis] = useState([]);
   const [recentTxns, setRecentTxns] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  // Modals state
+  // Admin Officer states
+  const [adminMetrics, setAdminMetrics] = useState(null);
+  const [pendingLoans, setPendingLoans] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  // Modals state (borrower only)
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [selectedEmiForPay, setSelectedEmiForPay] = useState(null);
 
   useEffect(() => {
     if (token) {
-      loadDashboardData();
+      if (isAdmin) {
+        loadAdminDashboardData();
+      } else {
+        loadBorrowerDashboardData();
+      }
     }
-  }, [token]);
+  }, [token, isAdmin]);
 
-  const loadDashboardData = async () => {
+  const loadBorrowerDashboardData = async () => {
     setLoading(true);
     try {
       await refreshWallet();
@@ -38,12 +51,358 @@ export default function DashboardView({ setActiveTab }) {
       if (upcomingData.success) setUpcomingEmis(upcomingData.upcomingEmis || []);
       if (txnsData.success) setRecentTxns((txnsData.transactions || []).slice(0, 6));
     } catch (err) {
-      console.error('Failed to load dashboard metrics:', err);
+      console.error('Failed to load borrower dashboard metrics:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const loadAdminDashboardData = async () => {
+    setLoading(true);
+    try {
+      const [metricsRes, pendingRes, ledgerRes] = await Promise.all([
+        fetch('/api/admin/metrics', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/loans/pending', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/ledger/my-history', { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+
+      const metricsData = await metricsRes.json();
+      const pendingData = await pendingRes.json();
+      const ledgerData = await ledgerRes.json();
+
+      if (metricsData.success) setAdminMetrics(metricsData.metrics);
+      if (pendingData.success) setPendingLoans(pendingData.pendingLoans || []);
+      if (ledgerData.success) setRecentTxns((ledgerData.transactions || []).slice(0, 8));
+    } catch (err) {
+      console.error('Failed to load admin dashboard metrics:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApproveDisburse = async (loanId) => {
+    if (!confirm('Authorize and disburse loan funds to borrower wallet?')) return;
+    setActionLoading(loanId);
+    try {
+      const res = await fetch(`/api/loans/${loanId}/disburse`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+
+      await loadAdminDashboardData();
+    } catch (err) {
+      alert('Error during authorization: ' + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (loanId) => {
+    const reason = prompt('Enter rejection reason:', 'Eligibility criteria not met');
+    if (!reason) return;
+    setActionLoading(loanId);
+    try {
+      const res = await fetch(`/api/loans/${loanId}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ reason })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+
+      await loadAdminDashboardData();
+    } catch (err) {
+      alert('Error during rejection: ' + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // RENDER: SYSTEM ADMINISTRATOR / LOAN OFFICER DASHBOARD
+  // -------------------------------------------------------------
+  if (isAdmin) {
+    return (
+      <div className="flex flex-col gap-6">
+        
+        {/* Officer Identity Well */}
+        <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-[8px] bg-[#171717] text-white flex items-center justify-center font-semibold text-base">
+              SA
+            </div>
+
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg font-semibold text-[#171717] tracking-tight">System Administrator</h1>
+                <span className="font-geist-mono text-[10px] text-[#171717] px-2 py-0.5 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] font-medium flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+                  OFFICER CONSOLE
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-[#8f8f8f] mt-1 font-geist-mono flex-wrap">
+                <span>{user?.email || 'admin@microlend.org'}</span>
+                <span>•</span>
+                <span>Institutional Portfolio &amp; Risk Management</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <button
+              onClick={() => setActiveTab('approvals')}
+              className="btn-app-primary"
+            >
+              <span className="material-symbols-outlined text-[16px]">fact_check</span>
+              <span>Approvals Queue ({pendingLoans.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('borrowers')}
+              className="btn-app-ghost"
+            >
+              <span>Borrower Directory</span>
+            </button>
+          </div>
+        </section>
+
+        {/* 4 Institutional KPI Metric Cards */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* Card 1: Total Disbursed Capital */}
+          <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f]">Disbursed Capital</span>
+                <span className="font-geist-mono text-[10px] text-[#10b981]">INSTITUTIONAL</span>
+              </div>
+              <div className="font-mono-num text-2xl font-semibold text-[#171717] tracking-tight">
+                {formatINR(adminMetrics?.totalDisbursed)}
+              </div>
+              <p className="text-xs text-[#8f8f8f] mt-1">
+                Cumulative capital disbursed to borrowers
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: Active Debt Portfolio */}
+          <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f]">Active Portfolio Debt</span>
+                <span className="font-geist-mono text-[10px] text-[#171717] font-medium">
+                  {adminMetrics?.activeLoansCount || 0} CONTRACTS
+                </span>
+              </div>
+              <div className="font-mono-num text-2xl font-semibold text-[#171717] tracking-tight">
+                {formatINR(adminMetrics?.activePortfolioDebt)}
+              </div>
+              <p className="text-xs text-[#8f8f8f] mt-1">
+                Current unamortized principal balance
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3: Pending Approvals */}
+          <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f]">Pending Approvals</span>
+                <span className={`font-geist-mono text-[10px] font-medium ${pendingLoans.length > 0 ? 'text-[#0070f3]' : 'text-[#10b981]'}`}>
+                  {pendingLoans.length > 0 ? 'ACTION REQUIRED' : 'CLEAR'}
+                </span>
+              </div>
+              <div className="font-mono-num text-2xl font-semibold text-[#171717] tracking-tight">
+                {pendingLoans.length}
+              </div>
+              <p className="text-xs text-[#8f8f8f] mt-1 font-geist-mono">
+                Loan requests awaiting officer review
+              </p>
+            </div>
+
+            <div className="pt-3 mt-1">
+              <button
+                onClick={() => setActiveTab('approvals')}
+                className="w-full btn-app-primary"
+              >
+                <span>Authorize Requests</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Card 4: Managed Borrowers */}
+          <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f]">Managed Borrowers</span>
+                <span className="font-geist-mono text-[10px] text-[#171717] font-medium">VERIFIED KYC</span>
+              </div>
+              <div className="font-mono-num text-2xl font-semibold text-[#171717] tracking-tight">
+                {adminMetrics?.borrowersCount || 0} Profiles
+              </div>
+              <p className="text-xs text-[#8f8f8f] mt-1">
+                Borrower accounts under officer management
+              </p>
+            </div>
+
+            <div className="pt-3 mt-1">
+              <button
+                onClick={() => setActiveTab('borrowers')}
+                className="w-full btn-app-ghost"
+              >
+                <span>View Directory</span>
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+        {/* Pending Loan Requests Queue (Quick Action) */}
+        <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-4">
+            <div>
+              <h3 className="font-semibold text-sm text-[#171717]">Pending Loan Requests</h3>
+              <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+                DISBURSE CAPITAL TO BORROWER OR DECLINE APPLICATION
+              </p>
+            </div>
+
+            <span className="font-geist-mono text-[10px] px-2 py-0.5 rounded-[100px] bg-[#171717] text-white">
+              {pendingLoans.length} PENDING
+            </span>
+          </div>
+
+          {pendingLoans.length === 0 ? (
+            <div className="py-8 text-center text-[#8f8f8f] text-xs font-geist-mono">
+              ZERO PENDING REQUESTS // ALL LOAN APPLICATIONS ARE PROCESSED
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
+                    <th className="py-2 px-3 font-medium">Borrower</th>
+                    <th className="py-2 px-3 font-medium">Product / Term</th>
+                    <th className="py-2 px-3 font-medium">Requested Principal</th>
+                    <th className="py-2 px-3 font-medium">Monthly EMI</th>
+                    <th className="py-2 px-3 font-medium text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f2f2f2]">
+                  {pendingLoans.slice(0, 5).map((loan) => (
+                    <tr key={loan.loanId} className="hover:bg-[#fafafa]">
+                      <td className="py-2.5 px-3">
+                        <div className="font-medium text-[#171717]">{loan.borrowerName}</div>
+                        <div className="font-geist-mono text-[11px] text-[#8f8f8f]">{loan.borrowerEmail}</div>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <div className="font-medium text-[#171717]">{loan.productName}</div>
+                        <div className="font-geist-mono text-[11px] text-[#8f8f8f]">{loan.termMonths}M • {loan.interestRate}% APR</div>
+                      </td>
+                      <td className="py-2.5 px-3 font-mono-num font-semibold text-[#171717]">
+                        {formatINR(loan.loanAmount)}
+                      </td>
+                      <td className="py-2.5 px-3 font-mono-num text-[#0070f3]">
+                        {formatINR(loan.emiAmount)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleApproveDisburse(loan.loanId)}
+                            disabled={actionLoading === loan.loanId}
+                            className="btn-app-primary text-xs py-1 px-2.5"
+                          >
+                            Approve &amp; Disburse
+                          </button>
+                          <button
+                            onClick={() => handleReject(loan.loanId)}
+                            disabled={actionLoading === loan.loanId}
+                            className="px-2 py-1 rounded-[6px] text-xs border border-[#ebebeb] text-[#ee0000] hover:bg-[#fff5f5]"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {/* Live Multi-User Ledger Feed */}
+        <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
+            <div>
+              <h3 className="font-semibold text-sm text-[#171717]">System Transaction Ledger Feed</h3>
+              <p className="font-geist-mono text-[11px] text-[#8f8f8f] mt-0.5">
+                REAL-TIME FINANCIAL ACTIVITY ACROSS ALL MANAGED BORROWERS
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveTab('ledger')}
+              className="btn-app-ghost text-xs"
+            >
+              Full Institutional Ledger
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
+                  <th className="py-2 px-3 font-medium">Borrower</th>
+                  <th className="py-2 px-3 font-medium">Operation</th>
+                  <th className="py-2 px-3 font-medium">Amount</th>
+                  <th className="py-2 px-3 font-medium">Timestamp</th>
+                  <th className="py-2 px-3 font-medium">Reference Code</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#f2f2f2] font-mono-num">
+                {recentTxns.map((t) => (
+                  <tr key={t.transactionId} className="hover:bg-[#fafafa]">
+                    <td className="py-2.5 px-3">
+                      <span className="font-sans font-medium text-[#171717]">{t.userName || 'System'}</span>
+                      <span className="font-geist-mono text-[11px] text-[#8f8f8f] block">{t.userEmail}</span>
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span className="font-geist-mono text-[10px] px-1.5 py-0.5 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#4d4d4d]">
+                        {t.transactionType}
+                      </span>
+                    </td>
+                    <td className={`py-2.5 px-3 font-medium ${
+                      t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT')
+                        ? 'text-[#10b981]'
+                        : 'text-[#171717]'
+                    }`}>
+                      {t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT') ? '+' : '-'} {formatINR(t.amount)}
+                    </td>
+                    <td className="py-2.5 px-3 text-[#8f8f8f] text-[11px]">
+                      {new Date(t.transactionDate).toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 font-medium text-[#171717] text-[11px]">
+                      {t.referenceNo}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // RENDER: BORROWER DASHBOARD (Cleaned of fake Aadhaar, Ledger Health card, and security labels)
+  // -------------------------------------------------------------
   const activeLoan = loans.find(l => l.loanStatus === 'ACTIVE');
   const nextEmi = upcomingEmis[0];
 
@@ -56,7 +415,7 @@ export default function DashboardView({ setActiveTab }) {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* 1. USER PROFILE & VERIFIED IDENTITY WELL */}
+      {/* 1. USER PROFILE WELL (Fake Aadhaar removed per Item 4) */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-[8px] bg-[#171717] text-white flex items-center justify-center font-semibold text-base">
@@ -73,14 +432,18 @@ export default function DashboardView({ setActiveTab }) {
             </div>
 
             <div className="flex items-center gap-3 text-xs text-[#8f8f8f] mt-1 font-geist-mono flex-wrap">
-              <span>AADHAAR: XXXX-XXXX-{user?.aadhaarNumber ? user.aadhaarNumber.slice(-4) : '8921'}</span>
-              <span>•</span>
               <span>{user?.email}</span>
+              {user?.phone && (
+                <>
+                  <span>•</span>
+                  <span>{user?.phone}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Quick Deposit & Withdrawal Controls */}
+        {/* Quick Deposit & Withdrawal Controls for Borrower */}
         <div className="flex items-center gap-2 self-start md:self-auto">
           <button
             onClick={() => setShowDeposit(true)}
@@ -98,8 +461,8 @@ export default function DashboardView({ setActiveTab }) {
         </div>
       </section>
 
-      {/* 2. 4-CARD FINANCIAL METRIC GRID (Geist Feature Cards) */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 2. 3-CARD FINANCIAL METRIC GRID (Ledger health card removed per Item 5a) */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* Card 1: Available Balance */}
         <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
@@ -112,7 +475,7 @@ export default function DashboardView({ setActiveTab }) {
               {formatINR(wallet?.currentBalance)}
             </div>
             <p className="text-xs text-[#8f8f8f] mt-1">
-              Authoritative PostgreSQL wallet balance
+              Verified digital wallet balance
             </p>
           </div>
         </div>
@@ -180,31 +543,6 @@ export default function DashboardView({ setActiveTab }) {
           </div>
         </div>
 
-        {/* Card 4: Ledger Audit Status */}
-        <div className="bg-white rounded-[12px] p-5 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-geist-mono text-[11px] uppercase tracking-wider text-[#8f8f8f]">Ledger Health</span>
-              <span className="font-geist-mono text-[10px] text-[#10b981] font-medium">100% BALANCED</span>
-            </div>
-            <div className="font-mono-num text-xl font-semibold text-[#171717] tracking-tight">
-              0 Discrepancies
-            </div>
-            <p className="text-xs text-[#8f8f8f] mt-1">
-              Historical ledger debits and credits reconcile exactly.
-            </p>
-          </div>
-
-          <div className="pt-3 mt-1">
-            <button
-              onClick={() => setActiveTab('inspector')}
-              className="w-full btn-app-ghost"
-            >
-              <span>Inspect DBMS Schema</span>
-            </button>
-          </div>
-        </div>
-
       </section>
 
       {/* 3. ACTIVE LOAN OVERVIEW */}
@@ -220,73 +558,73 @@ export default function DashboardView({ setActiveTab }) {
 
             <button
               onClick={() => setActiveTab('loans')}
-              className="font-geist-mono text-xs text-[#0070f3] hover:underline flex items-center gap-1"
+              className="btn-app-ghost text-xs"
             >
-              <span>Schedule ({activeLoan.paidEmis}/{activeLoan.totalEmis} Paid)</span>
-              <span className="material-symbols-outlined text-xs">arrow_forward</span>
+              Full Schedule
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#fafafa] p-4 rounded-[8px] border border-[#ebebeb] text-xs">
-            <div>
-              <p className="font-geist-mono text-[10px] uppercase text-[#8f8f8f]">Principal</p>
-              <p className="font-mono-num font-semibold text-[#171717] mt-0.5">{formatINR(activeLoan.loanAmount)}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-geist-mono">
+            <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+              <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Loan Amount</span>
+              <span className="font-mono-num font-semibold text-sm text-[#171717]">{formatINR(activeLoan.loanAmount)}</span>
             </div>
-            <div>
-              <p className="font-geist-mono text-[10px] uppercase text-[#8f8f8f]">APR</p>
-              <p className="font-mono-num font-semibold text-[#171717] mt-0.5">{activeLoan.interestRate}%</p>
+            <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+              <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Monthly EMI</span>
+              <span className="font-mono-num font-semibold text-sm text-[#0070f3]">{formatINR(activeLoan.emiAmount)}</span>
             </div>
-            <div>
-              <p className="font-geist-mono text-[10px] uppercase text-[#8f8f8f]">Monthly EMI</p>
-              <p className="font-mono-num font-semibold text-[#171717] mt-0.5">{formatINR(activeLoan.emiAmount)}</p>
+            <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+              <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Interest Rate</span>
+              <span className="font-medium text-[#171717]">{activeLoan.interestRate}% APR</span>
             </div>
-            <div>
-              <p className="font-geist-mono text-[10px] uppercase text-[#8f8f8f]">Outstanding</p>
-              <p className="font-mono-num font-semibold text-[#10b981] mt-0.5">{formatINR(activeLoan.outstandingBalance)}</p>
+            <div className="p-3 bg-[#fafafa] rounded-[8px] border border-[#ebebeb]">
+              <span className="text-[10px] uppercase text-[#8f8f8f] block mb-0.5">Progress</span>
+              <span className="font-medium text-[#10b981]">{activeLoan.paidEmis || 0} / {activeLoan.totalEmis || 12} Paid</span>
             </div>
           </div>
         </section>
       )}
 
-      {/* 4. RECENT ACTIVITY TABLE (Hairline Data Table) */}
+      {/* 4. RECENT FINANCIAL ACTIVITY */}
       <section className="bg-white rounded-[12px] p-6 border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="flex items-center justify-between pb-3 border-b border-[#f2f2f2] mb-3">
-          <h3 className="font-semibold text-sm text-[#171717]">Recent Transaction Activity</h3>
+          <h3 className="font-semibold text-sm text-[#171717]">Recent Transaction History</h3>
           <button
             onClick={() => setActiveTab('ledger')}
-            className="font-geist-mono text-xs text-[#0070f3] hover:underline flex items-center gap-1"
+            className="text-xs text-[#8f8f8f] hover:text-[#171717] font-geist-mono"
           >
-            <span>Full Statement</span>
-            <span className="material-symbols-outlined text-xs">arrow_forward</span>
+            View All ({recentTxns.length}) →
           </button>
         </div>
 
         {recentTxns.length === 0 ? (
-          <div className="text-center py-8 text-[#8f8f8f] text-xs font-geist-mono">NO TRANSACTIONS RECORDED</div>
+          <div className="py-6 text-center text-[#8f8f8f] text-xs font-geist-mono">NO TRANSACTIONS YET</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-[#ebebeb] text-[#8f8f8f] font-geist-mono text-[10px] uppercase">
-                  <th className="py-2 px-3 font-medium">Reference</th>
-                  <th className="py-2 px-3 font-medium">Type</th>
+                  <th className="py-2 px-3 font-medium">Operation</th>
                   <th className="py-2 px-3 font-medium">Amount</th>
-                  <th className="py-2 px-3 font-medium">Balance After</th>
-                  <th className="py-2 px-3 font-medium">Timestamp</th>
-                  <th className="py-2 px-3 font-medium">Description</th>
+                  <th className="py-2 px-3 font-medium">Post Balance</th>
+                  <th className="py-2 px-3 font-medium">Date</th>
+                  <th className="py-2 px-3 font-medium">Reference Code</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f2f2f2] font-mono-num">
                 {recentTxns.map((t) => (
-                  <tr key={t.transactionId} className="hover:bg-[#fafafa] transition-colors">
-                    <td className="py-2.5 px-3 font-medium text-[#171717]">{t.referenceNo}</td>
+                  <tr key={t.transactionId} className="hover:bg-[#fafafa]">
                     <td className="py-2.5 px-3">
                       <span className="font-geist-mono text-[10px] px-1.5 py-0.5 rounded-[4px] border border-[#ebebeb] bg-[#fafafa] text-[#4d4d4d]">
                         {t.transactionType}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 font-medium text-[#171717]">
-                      {formatINR(t.amount)}
+                    <td className={`py-2.5 px-3 font-medium ${
+                      t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT')
+                        ? 'text-[#10b981]'
+                        : 'text-[#171717]'
+                    }`}>
+                      {t.transactionType.includes('CREDIT') || t.transactionType.includes('DISBURSEMENT') ? '+' : '-'} {formatINR(t.amount)}
                     </td>
                     <td className="py-2.5 px-3 text-[#4d4d4d]">
                       {formatINR(t.balanceAfter)}
@@ -294,8 +632,8 @@ export default function DashboardView({ setActiveTab }) {
                     <td className="py-2.5 px-3 text-[#8f8f8f] text-[11px]">
                       {new Date(t.transactionDate).toLocaleDateString()}
                     </td>
-                    <td className="py-2.5 px-3 text-[#4d4d4d] font-sans text-xs">
-                      {t.remarks}
+                    <td className="py-2.5 px-3 font-medium text-[#171717] text-[11px]">
+                      {t.referenceNo}
                     </td>
                   </tr>
                 ))}
@@ -309,18 +647,20 @@ export default function DashboardView({ setActiveTab }) {
       <DepositModal
         isOpen={showDeposit}
         onClose={() => setShowDeposit(false)}
-        onSuccess={loadDashboardData}
+        onSuccess={loadBorrowerDashboardData}
       />
       <WithdrawModal
         isOpen={showWithdraw}
         onClose={() => setShowWithdraw(false)}
-        onSuccess={loadDashboardData}
+        currentBalance={wallet?.currentBalance || 0}
+        onSuccess={loadBorrowerDashboardData}
       />
       <RepayEmiModal
         isOpen={!!selectedEmiForPay}
         onClose={() => setSelectedEmiForPay(null)}
         emi={selectedEmiForPay}
-        onSuccess={loadDashboardData}
+        walletBalance={wallet?.currentBalance || 0}
+        onSuccess={loadBorrowerDashboardData}
       />
 
     </div>

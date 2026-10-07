@@ -55,21 +55,29 @@ export default function WalletView() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setShowDeposit(true)}
-            className="btn-marketing-primary text-xs py-2 px-4.5"
-          >
-            <span className="material-symbols-outlined text-sm">add</span>
-            <span>Deposit Funds</span>
-          </button>
-          <button
-            onClick={() => setShowWithdraw(true)}
-            className="btn-marketing-secondary text-xs py-2 px-4.5"
-          >
-            <span>Withdraw Funds</span>
-          </button>
-        </div>
+        {user?.role === 'ADMIN' ? (
+          <div className="flex items-center gap-2">
+            <span className="font-geist-mono text-xs text-[#8f8f8f] px-3 py-1.5 rounded-[6px] bg-[#f5f5f5] border border-[#ebebeb]">
+              INSTITUTIONAL TREASURY ACCOUNT
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setShowDeposit(true)}
+              className="btn-marketing-primary text-xs py-2 px-4.5"
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              <span>Deposit Funds</span>
+            </button>
+            <button
+              onClick={() => setShowWithdraw(true)}
+              className="btn-marketing-secondary text-xs py-2 px-4.5"
+            >
+              <span>Withdraw Funds</span>
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Automated Ledger Reconciliation Card */}

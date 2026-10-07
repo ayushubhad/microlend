@@ -71,13 +71,15 @@ export default function LoansView({ setActiveTab }) {
           </p>
         </div>
 
-        <button
-          onClick={() => setActiveTab('products')}
-          className="btn-app-primary self-start md:self-auto"
-        >
-          <span className="material-symbols-outlined text-sm">add</span>
-          <span>Apply For Loan</span>
-        </button>
+        {user?.role !== 'ADMIN' && (
+          <button
+            onClick={() => setActiveTab('products')}
+            className="btn-app-primary self-start md:self-auto"
+          >
+            <span className="material-symbols-outlined text-sm">add</span>
+            <span>Apply For Loan</span>
+          </button>
+        )}
       </section>
 
       {/* Loan Selection Cards or Empty State */}

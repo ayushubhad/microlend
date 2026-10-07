@@ -232,13 +232,19 @@ export default function ProductsView({ setActiveTab }) {
             </div>
 
             <div className="pt-2">
-              <button
-                onClick={() => setSelectedProduct(p)}
-                className="btn-marketing-primary w-full text-xs py-2.5"
-              >
-                <span>Apply for Micro-Credit</span>
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
+              {user?.role === 'ADMIN' ? (
+                <div className="p-2.5 rounded-[8px] bg-[#fafafa] border border-[#ebebeb] text-center font-geist-mono text-xs text-[#8f8f8f]">
+                  OFFICER MODE // BORROWER APPLICATION ONLY
+                </div>
+              ) : (
+                <button
+                  onClick={() => setSelectedProduct(p)}
+                  className="btn-marketing-primary w-full text-xs py-2.5"
+                >
+                  <span>Apply for Micro-Credit</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+              )}
             </div>
           </div>
         ))}
