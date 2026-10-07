@@ -33,9 +33,11 @@ export default function Header({ onOpenAuthModal, activeTab, setActiveTab, onSig
             onClick={() => setActiveTab(user ? 'dashboard' : 'home')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <svg width="18" height="16" viewBox="0 0 76 65" fill="#171717">
-                <path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/>
+            <div className="w-8 h-8 rounded-[8px] bg-[#0B192C] flex items-center justify-center shadow-xs">
+              <svg className="w-5 h-5" viewBox="0 0 48 48" fill="none">
+                <path d="M24 8L37 14V24C37 32 29.5 38.5 24 40C18.5 38.5 11 32 11 24V14L24 8Z" stroke="#0066FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M19 23L23 27L30 19" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="24" cy="24" r="3" fill="#0066FF" fillOpacity="0.3"/>
               </svg>
             </div>
             <span className="font-semibold text-sm tracking-tight text-[#171717]">MicroLend</span>
