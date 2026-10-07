@@ -26,7 +26,7 @@ MicroLend demonstrates why an **RDBMS (specifically PostgreSQL)** is indispensab
 
 ## 2. Technology Stack (PERN Architecture)
 
-* **Frontend:** React 19 + Vite + Tailwind CSS (Styled using the *Transactional Trust Engine* design system from Google Stitch).
+* **Frontend:** React 19 + Vite + Tailwind CSS (Engineered using the **Vercel Geist Design System** with Geist Sans & Geist Mono typography).
 * **Backend:** Node.js + Express (Modular architecture: routes, controllers, middleware, financial engine).
 * **Database:** **PostgreSQL 18.4** (Strictly relational, ACID-compliant OLTP engine with connection pooling via `pg.Pool`).
 * **Security:** Cryptographic password hashing (`bcrypt`), stateless JWT authentication, and database-level trigger defenses.
@@ -58,12 +58,12 @@ The database schema strictly adheres to **Third Normal Form (3NF)**:
 ```
 
 ### Relational Entities:
-1. **`users`:** Borrower identity, hashed credentials, contact information, and unique Aadhaar identification.
-2. **`wallets`:** Authoritative digital wallet storing verified cash balances (`current_balance`), exclusively locked during operations.
-3. **`loan_products`:** Institutional catalog defining interest rates (APR %), tenures (months), processing fees, and principal boundaries.
-4. **`loan_accounts`:** Legally binding loan contracts instantiated between a user and a product, tracking outstanding balances.
-5. **`emi_schedules`:** Detailed installment schedules with Principal and Interest splits per installment.
-6. **`transaction_ledger`:** Immutable, append-only financial audit log with pre- and post-transaction balances.
+1. **`users`:** Customer profiles, hashed credentials (`bcrypt`), role definitions (`USER` vs `ADMIN`), and unique Aadhaar identification.
+2. **`wallets`:** Authoritative digital wallet storing verified cash balances (`current_balance`), exclusively locked during financial operations.
+3. **`loan_products`:** Master catalog defining interest rates (APR %), tenures (months), processing fees, and principal boundaries.
+4. **`loan_accounts`:** Legally binding loan contracts instantiated between a user and a product, tracking outstanding balances and disbursement states.
+5. **`emi_schedules`:** Detailed installment schedules with Principal and Interest splits per installment based on the reducing balance formula.
+6. **`transaction_ledger`:** Immutable, append-only financial audit journal with pre- and post-transaction balances.
 
 ### Reconciling `User.Wallet_Balance` vs. `Wallet.Current_Balance`:
 To maintain strict 3NF while fulfilling both the literal text specification and the ER diagram:
@@ -79,10 +79,21 @@ To prevent the classic double-spending attack (e.g., submitting two concurrent w
 
 ```sql
 BEGIN;
-SELECT current_balance FROM wallets WHERE user_id = $1 FOR UPDATE;
--- Thread B blocks and waits until Thread A commits or rolls back
-UPDATE wallets SET current_balance = current_balance - $amount WHERE user_id = $1;
-INSERT INTO transaction_ledger (...) VALUES (...);
+
+  -- 1. Acquire exclusive lock on borrower wallet
+  SELECT wallet_id, current_balance FROM wallets WHERE user_id = $1 FOR UPDATE;
+
+  -- 2. Deduct EMI from wallet
+  UPDATE wallets SET current_balance = current_balance - $2 WHERE wallet_id = $3;
+
+  -- 3. Amortize loan balance and mark installment paid
+  UPDATE emi_schedules SET payment_status = 'PAID', paid_date = CURRENT_TIMESTAMP WHERE emi_id = $4;
+  UPDATE loan_accounts SET outstanding_balance = outstanding_balance - $5 WHERE loan_id = $6;
+
+  -- 4. Append immutable entry to transaction ledger (Trigger-Protected)
+  INSERT INTO transaction_ledger (user_id, wallet_id, loan_id, transaction_type, amount, balance_after_transaction, reference_no)
+  VALUES ($1, $3, $6, 'EMI_PAYMENT', $2, $7, $8);
+
 COMMIT;
 ```
 
@@ -101,21 +112,26 @@ $$\text{Equated Monthly Installment (EMI): } E = P \times \frac{r(1 + r)^n}{(1 +
 
 * **Monthly Interest Component:** $I_m = \text{round}(\text{Balance}_{m-1} \times r, 2)$
 * **Monthly Principal Component:** $P_m = E - I_m$
-* **Final Month Adjustment:** On month $n$, $P_n$ is set to remaining balance so ending balance reaches exactly **$0.00**.
+* **Final Month Adjustment:** On month $n$, $P_n$ is adjusted so the remaining ending balance reaches exactly **₹0.00**.
 
 ---
 
-## 6. Pre-Configured Demo Accounts
+## 6. Pre-Configured Demo Accounts & Login Flow
 
-For immediate evaluation and live demonstration:
+For immediate evaluation and live demonstration, the system comes seeded with three specific user personas:
 
 | Role | Name | Email | Password | Pre-Configured State |
 | :--- | :--- | :--- | :--- | :--- |
-| **Active Borrower** | Priya Sharma | `priya.sharma@example.com` | `Password@123` | Active Loan of ₹45,000, 3 EMIs paid, ₹24,500 wallet balance |
-| **System Admin** | Admin | `admin@microlend.org` | `AdminPassword@123` | System oversight, product management, audit ledger |
-| **New Borrower** | Dr. Arvind Rao | `arvind.rao@example.com` | `Password@123` | ₹15,000 wallet balance, eligible to apply |
+| **Active Borrower** | Priya Sharma | `priya@gmail.com` | `Priya123` | Active Loan of ₹45,000, 12-Month Amortization, ₹26,000 wallet balance |
+| **Clean-Slate Borrower** | Dr. Arvind Rao | `arvind@gmail.com` | `Arvind123` | ₹15,000 wallet balance, 0 active loans, pre-verified Aadhaar |
+| **System Administrator** | System Administrator | `admin@gov.in` | `Admin123` | Loan Officer Console: Underwrite loans, inspect borrower directory, institutional ledger |
 
-*(You can switch between these personas instantly using the header dropdown in the top right corner!)*
+### User Experience & Authentication Features:
+1. **Homepage with Quick Persona Sign In:** Unauthenticated visitors land directly on the Homepage featuring 3 one-click persona cards that pre-fill credentials for fast sign in.
+2. **Instant Re-Prompt on Sign Out:** Signing out automatically returns to the Homepage and opens the sign-in modal.
+3. **Role-Based Views:**
+   * **Borrowers** access self-service dashboards, loan applications, EMI repayment buttons, wallet management, and their personal ledger.
+   * **System Administrators** access the **Officer Console**, complete with approval/rejection workflows, borrower directory oversight, and institutional ledger audit.
 
 ---
 
@@ -137,21 +153,28 @@ npm run dev
 ```
 * **Frontend:** `http://localhost:3000`
 * **Backend:** `http://localhost:5000`
-* **PostgreSQL:** Native engine runs automatically on port `5432` with zero manual configuration.
+* **PostgreSQL Engine:** Runs natively on port `5432` automatically on server launch.
 
 ---
 
-## 8. Automated Testing & Academic Verification
+## 8. Automated Testing & Verification
 
-### Run Concurrency Stress Test (Double-Spending Attack Simulation):
+### 1. Verify User Logins (100% Accuracy Check):
+```bash
+node server/tests/test_logins.js
+```
+* Authenticates all 3 seeded user credentials (`priya@gmail.com`, `arvind@gmail.com`, `admin@gov.in`) against PostgreSQL bcrypt hashes.
+* Verifies rejection of invalid passwords and non-existent users.
+
+### 2. Run Concurrency Stress Test (Double-Spending Attack Simulation):
 ```bash
 npm run test:concurrency
 ```
-* Spawns 5 parallel concurrent withdrawal requests of ₹400 from a ₹1,000 wallet.
-* Proves that `SELECT ... FOR UPDATE` serializes the requests: exactly 2 succeed, 3 are safely rejected, and final balance is exactly ₹200.00.
+* Spawns parallel concurrent withdrawal requests against the same wallet.
+* Proves that `SELECT ... FOR UPDATE` serializes the requests and eliminates race conditions.
 * Spawns simultaneous duplicate EMI payments on the same installment and proves only 1 succeeds.
 
-### Run Comprehensive Backend Verification:
+### 3. Run Comprehensive Backend Verification:
 ```bash
 npm run test:verify
 ```
@@ -161,8 +184,8 @@ npm run test:verify
 
 ## 9. Syllabus Demonstration Queries
 
-A dedicated demonstration script is provided at [`sql/demo_queries.sql`](file:///c:/Users/ASUS/my%20codes/dbms/sql/demo_queries.sql) containing:
-* Multi-table `JOIN` queries connecting 5 relational entities.
+A demonstration script is provided at [`sql/demo_queries.sql`](sql/demo_queries.sql) containing:
+* Multi-table `JOIN` queries connecting relational entities.
 * `GROUP BY` and aggregate functions (`SUM`, `AVG`, `COUNT`, `MIN`, `MAX`).
 * Explicit multi-step transaction blocks with `SELECT ... FOR UPDATE`.
 * First-principles ledger summation query proving that $\text{Balance} = \sum \text{Credits} - \sum \text{Debits}$.
